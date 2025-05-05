@@ -1,4 +1,4 @@
-<x-layouts.backend>
+<x-layouts.backend title="Types">
     <div class="row">
         <div class="col-md-12 mb-4">
             <a href="{{ route('backend.type.create') }}" class="btn btn-success">Add New Type</a>
