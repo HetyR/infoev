@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\FinderController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\Api\LoginController; // Perbaiki penamaan class
 use App\Http\Controllers\Api\ListController;
+use App\Http\Controllers\Api\ChargerStationController;
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
@@ -31,12 +32,35 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+    /// Route Baru dari Programmer Handal ///
+    // Auth
+    Route::prefix('auth')->group(function () { 
+        // Login
+        Route::post('/login', [LoginController::class, 'login']); 
+         // Login with google
+        Route::post('/google/login', [LoginController::class, 'loginWithGoogle']);  
+        // Logout
+        Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:sanctum');
+    });   
+
+    // Charger Station
+    Route::get('/charger/search', [ChargerStationController::class, 'search'])->name('charger.search');
+
+    // Find City
+    Route::get('/cities', [ChargerStationController::class, 'getCities']); 
+    Route::get('/cities/search', [ChargerStationController::class, 'searchCities']);
+
+
+
+
+    /// Route Default dari Pakde Arsi ///
     // Search
     Route::get('/cari', [HomeController::class, 'search'])
         ->name('search');
 
     // Finder
-    Route::get('/find', [FinderController::class, 'ind'])->name('finder.ind');
+    // Route::get('/find', [FinderController::class, 'ind'])->name('finder.ind');
     Route::get('/find/search', [FinderController::class, 'show'])->name('finder.show');
     Route::get('/finder', [FinderController::class, 'index'])->name('finder.index');
     Route::get('/finder/search', [FinderController::class, 'search'])->name('finder.search');
