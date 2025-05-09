@@ -4,30 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Backend - InfoEV</title>
-    
     <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
 
     <!-- Bootstrap & FontAwesome -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <!-- Laravel Asset Styles -->
-    <link rel="stylesheet" href="{{ asset('assets/modules/datatables/datatables.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/modules/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/modules/datatables/Select-1.2.4/css/select.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/components.css') }}">
-
-    <!-- GA Tag -->
-    <meta name="robots" content="noindex, nofollow">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-94034622-3"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'UA-94034622-3');
-    </script>
 
     <!-- Vite & Optional Style Injection -->
     {{ $css ?? '' }}
@@ -46,7 +31,6 @@
             <!-- Logo & Menu -->
             <div class="flex items-center space-x-4">
                 <span class="text-xl font-bold text-indigo-600">Admin Panel</span>
-
                 <div class="hidden md:flex space-x-4">
                     @php
                         $menus = [
@@ -148,25 +132,8 @@
 </main>
 
 <!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous">
-</script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 <script src="{{ asset('assets/modules/jquery.min.js') }}"></script>
-<script src="{{ asset('assets/modules/popper.js') }}"></script>
-<script src="{{ asset('assets/modules/tooltip.js') }}"></script>
-<script src="{{ asset('assets/modules/bootstrap/js/bootstrap.min.js') }}"></script>
-<script src="{{ asset('assets/modules/nicescroll/jquery.nicescroll.min.js') }}"></script>
-<script src="{{ asset('assets/modules/moment.min.js') }}"></script>
-<script src="{{ asset('assets/js/stisla.js') }}"></script>
-
-<script src="{{ asset('assets/modules/datatables/datatables.min.js') }}"></script>
-<script src="{{ asset('assets/modules/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('assets/modules/datatables/Select-1.2.4/js/dataTables.select.min.js') }}"></script>
-<script src="{{ asset('assets/modules/jquery-ui/jquery-ui.min.js') }}"></script>
-<script src="{{ asset('assets/js/page/modules-datatables.js') }}"></script>
-<script src="{{ asset('assets/js/scripts.js') }}"></script>
-<script src="{{ asset('assets/js/custom.js') }}"></script>
 
 {{ $js ?? '' }}
 

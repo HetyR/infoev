@@ -87,8 +87,9 @@ class SpecController extends Controller
             'unit' => is_null($request->unit) ? null : $request->unit,
         ];
 
+        $spec->fill($formFields);
         $spec->specCategory()->associate($cat);
-        $spec->update($formFields);
+        $spec->save();
 
         if (count($request->specLists) > 1 || !is_null($request->specLists[0])) {
             $spec->lists()->delete();

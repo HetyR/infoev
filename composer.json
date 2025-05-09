@@ -7,11 +7,13 @@
     "require": {
         "php": "^8.0.2",
         "doctrine/dbal": "^3.6",
+        "dompdf/dompdf": "^3.1",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/socialite": "^5.14",
-        "laravel/tinker": "^2.7"
+        "laravel/tinker": "^2.7",
+        "maatwebsite/excel": "^3.1"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",

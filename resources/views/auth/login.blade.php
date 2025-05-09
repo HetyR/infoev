@@ -1,13 +1,9 @@
-<!-- resources/views/auth/login.blade.php -->
-
 <x-layouts.backend>
     <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh; background-color: #f9f9f9;">
         <div class="col-md-6 col-lg-5 px-3">
             <div class="card border-0 shadow rounded-4">
                 <div class="card-header bg-white border-bottom-0 text-center pt-4">
-                    <h4 class="fw-bold text-dark">{{ __('Welcome Back') }}</h4>
-                    <p class="text-muted mb-0 small">{{ __('Login to access your dashboard') }}</p>
-                </div>
+                    <h4 class="fw-bold text-dark">{{ __('Welcome Back') }}</h4>                </div>
 
                 <div class="card-body p-4">
                     <form method="POST" action="{{ route('auth.login.store') }}">
@@ -35,7 +31,7 @@
 
                         <!-- Submit -->
                         <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-success rounded-pill fw-semibold">
+                            <button type="submit" class="btn btn-outline-success rounded-pill fw-semibold">
                                 {{ __('Login') }}
                             </button>
                         </div>

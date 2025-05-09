@@ -1,6 +1,11 @@
-<x-layouts.backend>
+<x-layouts.backend title="Edit Vehicle">
     <div class="row justify-content-center">
         <div class="col-lg-8 my-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white fw-bold">
+                    Edit Vehicle
+                </div>
+                <div class="card-body">
             <form method="POST" action="{{ route('backend.vehicle.update', ['vehicle' => $vehicle->slug]) }}" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
@@ -185,17 +190,26 @@
                                 </select>
                             </div>
                             <div class="col-sm-2">
-                                <button type="button" class="btn btn-success" onclick="addSpec()">Add</button>
+                                <button type="button" class="btn btn-outline-success btn-sm mb-3" onclick="addSpec()">Add</button>
                             </div>
+                            
                         </div>
                     @endforelse
                 </div>
 
-                <button type="submit" class="btn btn-primary">Update</button>
-                <a href="{{ route('backend.vehicle.index') }}" class="btn btn-outline-secondary">Back</a>
+                <div class="d-flex justify-content-start gap-2 mt-4">
+                    <button type="submit" class="btn btn-sm btn-outline-primary hover-shadow">
+                        <i class="fas fa-save me-1"></i> Update
+                    </button>
+                    <a href="{{ route('backend.vehicle.index') }}" class="btn btn-sm btn-outline-secondary hover-shadow">
+                        <i class="fas fa-arrow-left me-1"></i> Back
+                    </a>
+                </div>
             </form>
         </div>
     </div>
+    </div>
+</div>
 
     <template data-template>
         <div class="row mt-4" data-parent>

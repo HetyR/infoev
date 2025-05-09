@@ -1,43 +1,57 @@
-<x-layouts.backend>
+<x-layouts.backend title="Tambah Vehicle">
     <div class="row justify-content-center">
         <div class="col-lg-8 my-4">
-            <form method="POST" action="{{ route('backend.vehicle.store') }}" enctype="multipart/form-data">
-                @csrf
-                <div class="mb-3">
-                    <label for="type" class="form-label d-block">Type</label>
-                    <select class="form-select" name="type" id="type">
-                        <option value="" disabled selected hidden>Select type</option>
-                        @foreach ($types as $type)
-                            <option value="{{ $type->id }}">{{ $type->name }}</option>
-                        @endforeach
-                    </select>
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white fw-bold">
+                    Add New Vehicle
                 </div>
-                <div class="mb-3">
-                    <label for="brand" class="form-label d-block">Brand</label>
-                    <select class="form-select" name="brand" id="brand">
-                        <option value="" disabled selected hidden>Select brand</option>
-                        @foreach ($brands as $brand)
-                            <option value="{{ $brand->id }}">{{ $brand->name }}</option>
-                        @endforeach
-                    </select>
+                <div class="card-body">
+                    <form method="POST" action="{{ route('backend.vehicle.store') }}" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="type" class="form-label d-block">Type</label>
+                            <select class="form-select" name="type" id="type">
+                                <option value="" disabled selected hidden>Select type</option>
+                                @foreach ($types as $type)
+                                    <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="brand" class="form-label d-block">Brand</label>
+                            <select class="form-select" name="brand" id="brand">
+                                <option value="" disabled selected hidden>Select brand</option>
+                                @foreach ($brands as $brand)
+                                    <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="pictures" class="form-label">Pictures</label>
+                            <input type="file" class="form-control" id="pictures" name="pictures[]" accept="image/png, image/jpeg" multiple>
+                        </div>
+                        <div class="mb-3" data-specification>
+                            <label class="form-label">Specification</label>
+                        </div>
+                        
+                        <div class="d-flex justify-content-start gap-2 mt-4">
+                            <button type="submit" class="btn btn-sm btn-outline-primary hover-shadow">
+                                <i class="fas fa-save me-1"></i> Submit
+                            </button>
+                            <a href="{{ route('backend.vehicle.index') }}" class="btn btn-sm btn-outline-secondary hover-shadow">
+                                <i class="fas fa-arrow-left me-1"></i> Back
+                            </a>
+                        </div>
+                    </form>
                 </div>
-                <div class="mb-3">
-                    <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="name" name="name">
-                </div>
-                <div class="mb-3">
-                    <label for="pictures" class="form-label">Pictures</label>
-                    <input type="file" class="form-control" id="pictures" name="pictures[]" accept="image/png, image/jpeg" multiple>
-                </div>
-                <div class="mb-3" data-specification>
-                    <label class="form-label">Specification</label>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Submit</button>
-                <a href="{{ route('backend.vehicle.index') }}" class="btn btn-outline-secondary">Back</a>
-            </form>
+            </div>
         </div>
     </div>
+
 
     <template data-template>
         <div class="row mt-4" data-parent>

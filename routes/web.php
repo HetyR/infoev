@@ -25,6 +25,8 @@ use App\Http\Controllers\FinderController;
 use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\PrivacyController;
+use App\Http\Controllers\backend\DashboardController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -62,10 +64,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/keranjang/{vehicleId}', [KeranjangController::class, 'remove'])->name('keranjang.remove');
     //wishlist
 
-
     Route::middleware('role:1')->group(function () {
         // Backend routes only for users with role 1
         Route::prefix('backend')->group(function () {
+      
             // Option
             Route::get('/dashboard', [OptionController::class, 'dashboard'])->name('backend.dashboard');
             Route::put('/option', [OptionController::class, 'update'])->name('backend.option.update');
