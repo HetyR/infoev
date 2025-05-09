@@ -53,4 +53,6 @@ class Type extends Model
     public function thumbnail() {
         return $this->morphOne(File::class, 'fileable');
     }
+
+    
 }

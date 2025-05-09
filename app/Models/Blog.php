@@ -62,6 +62,12 @@ class Blog extends Model
         return $this->hasOne(StickyArticle::class);
     }
 
+    public function tipsAndTrick()
+    {
+        return $this->hasOne(TipsAndTrick::class);
+    }
+
+
     public function comments() {
         return $this->morphMany(Comment::class, 'commentable');
     }

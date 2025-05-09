@@ -13,8 +13,17 @@
             <li>
                 <a href="{{ route('blog.index') }}" class="block px-8 py-4 hover:bg-purple-900 hover:text-white">BERITA</a>
             </li>
+           <li>
+                <a href="{{ route('tips.index') }}" class="block px-8 py-4 hover:bg-purple-900 hover:text-white">TIPS & TRICK</a>
+            </li>
             <li>
                 <a href="{{ route('compare.index') }}" class="block px-8 py-4 hover:bg-purple-900 hover:text-white">COMPARE</a>
+            </li>
+            <li>
+                <a href="" class="block px-8 py-4 hover:bg-purple-900 hover:text-white">KALKULASI EV</a>
+            </li>
+             <li>
+                <a href="" class="block px-8 py-4 hover:bg-purple-900 hover:text-white">CHARGING STATION</a>
             </li>
             @auth
                 @if (auth()->user()->role == 1)

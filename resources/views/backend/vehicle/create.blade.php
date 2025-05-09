@@ -66,7 +66,7 @@
                 </select>
             </div>
             <div class="col-sm-2">
-                <button type="button" class="btn btn-danger" onclick="removeSpec(this)">Remove</button>
+                <button type="button" class="btn btn-outline-danger" onclick="removeSpec(this)">Remove</button>
             </div>
         </div>
     </template>
@@ -208,7 +208,7 @@
 
                         if (i === 1) {
                             const firstContainer = document.querySelector('[data-parent]');
-                            firstContainer.lastElementChild.innerHTML = '<button type="button" class="btn btn-success" onclick="addSpec()">Add</button>';
+                            firstContainer.lastElementChild.innerHTML = '<button type="button" class="btn btn-outline-success" onclick="addSpec()">Add</button>';
                             firstContainer.classList.remove('mt-4');
                         }
 

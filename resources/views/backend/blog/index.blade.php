@@ -55,7 +55,16 @@
                                                 </button>
                                             </form>
                                         @endif
+                                        @if (is_null($post->tipsAndTrick))
+                                            <form class="d-inline-block" action="{{ route('backend.tipsAndTrick.store', ['blog' => $post->slug]) }}" onsubmit="return confirm('Add to Tips & Trick?')" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-outline-success custom-hover">
+                                                    <i class="fas fa-lightbulb me-1"></i> Tips & Trick
+                                                </button>
+                                            </form>
+                                        @endif
                                     </td>
+
                                 </tr>
                             @endforeach
                         </tbody>

@@ -10,6 +10,7 @@ use App\Http\Controllers\backend\MarketplaceController;
 use App\Http\Controllers\backend\OptionController;
 use App\Http\Controllers\backend\SpecController;
 use App\Http\Controllers\backend\StickyArticleController;
+use App\Http\Controllers\Backend\TipsAndTrickController;
 use App\Http\Controllers\backend\TypeController as BackendTypeController;
 use App\Http\Controllers\backend\VehicleController as BackendVehicleController;
 use App\Http\Controllers\BlogController;
@@ -123,6 +124,15 @@ Route::middleware('auth')->group(function () {
             Route::get('/sticky-articles', [StickyArticleController::class, 'index'])
                     ->name('backend.stickyArticle.index');
 
+            // Tips and Trick
+            Route::post('/tips-and-trick/store/{blog}', [TipsAndTrickController::class, 'store'])
+                    ->name('backend.tipsAndTrick.store');
+           Route::delete('/tips-and-trick/{tipsAndTrick}', [TipsAndTrickController::class, 'destroy'])
+                ->name('backend.tipsAndTrick.destroy');
+            Route::get('/tips-and-trick', [TipsAndTrickController::class, 'index'])
+                    ->name('backend.tipsAndTrick.index');
+
+                
             // Spec
             Route::prefix('spec')->group(function () {
                 Route::get('category/create', [SpecController::class, 'createCategory'])->name('backend.spec.category.create');
@@ -218,3 +228,7 @@ Route::get('/tipe', [TypeController::class, 'index'])->name('type.index');
 Route::get('/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
 Route::post('/comment/store', [CommentController::class, 'store'])->name('comment.post');
 Route::post('/vehicle/toggle-love/{id}', [VehicleController::class, 'toggleLove'])->name('vehicle.toggleLove');
+
+// Tips and Trick
+Route::get('/tips-and-trick', [TipsAndTrickController::class, 'index'])->name('tips.index');
+Route::get('/tips-and-trick/{tips}', [TipsAndTrickController::class, 'show'])->name('tips.show');

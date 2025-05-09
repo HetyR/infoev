@@ -38,6 +38,7 @@
                             ['name' => 'Brands', 'route' => 'backend.brand.index'],
                             ['name' => 'Blogs', 'route' => 'backend.blog.index'],
                             ['name' => 'Sticky Articles', 'route' => 'backend.stickyArticle.index'],
+                            ['name' => 'Tips and Tricks', 'route' => 'backend.tipsAndTrick.index'],
                             ['name' => 'Specifications', 'route' => 'backend.spec.index'],
                             ['name' => 'Vehicles', 'route' => 'backend.vehicle.index'],
                             ['name' => 'Marketplaces', 'route' => 'backend.marketplace.index'],

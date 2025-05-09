@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Blog;
+use App\Models\Type;
 use App\Models\Brand;
 use App\Models\Option;
 use App\Models\Spec;
@@ -12,7 +13,8 @@ use Illuminate\Http\Request;
 
 class BrandController extends Controller
 {
-    public function index() {
+
+    public function index(Request $request) {
         $stickies = Blog::with('thumbnail')
                         ->select('sticky_articles.*', 'blogs.*')
                         ->join('sticky_articles', 'blogs.id', '=', 'sticky_articles.blog_id')
@@ -36,8 +38,26 @@ class BrandController extends Controller
             ['name', 'brand']
         ])->with('thumbnail')->first();
 
+        // Ambil data tipe untuk filter
+        $types = Type::all(); // Mengambil semua tipe yang ada
+
+        // Jika ada filter tipe, ambil brand berdasarkan tipe yang dipilih
+        $brandsQuery = Brand::orderBy('name')->withCount('vehicles')->having('vehicles_count', '>', 0);
+        
+        // Cek apakah ada filter tipe
+        if ($request->has('type') && $request->type) {
+            // Perbaiki bagian filter dengan menggunakan relasi yang tepat
+            $brandsQuery->whereHas('vehicles', function ($query) use ($request) {
+                $query->where('type_id', $request->type);
+            });
+        }
+
+        // Menjalankan query dan mengambil hasilnya
+        $brands = $brandsQuery->get();
+
         return view('brand.index', [
-            'items' => Brand::orderBy('name')->withCount('vehicles')->having('vehicles_count', '>', 0)->get(),
+            'items' => $brands,
+            'types' => $types, // Kirimkan data tipe ke view
             'banner' => is_null($banner) || is_null($banner->thumbnail)  ? null : $banner->thumbnail,
             'stickies' => $stickies,
             'recentVehicles' => Vehicle::with('brand')->latest()->limit(8)->get(),
@@ -50,6 +70,8 @@ class BrandController extends Controller
             'logo' => Option::where('type', 'logo')->with('thumbnail')->first()
         ]);
     }
+
+
 
     // public function index() {
     //     $stickies = Blog::with('thumbnail')
