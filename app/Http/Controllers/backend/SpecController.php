@@ -60,7 +60,8 @@ class SpecController extends Controller
 
     public function storeSpec(Request $request) {
         $formFields = [
-            'name' => $request->name
+            'name' => $request->name,
+            'type' => $request->type 
         ];
         if (!is_null($request->hidden)) {
             $formFields['hidden'] = true;
@@ -69,39 +70,65 @@ class SpecController extends Controller
         SpecCategory::find($request->catId)
                     ->specs()
                     ->create($formFields);
+
         return redirect()->route('backend.spec.index');
     }
 
-    public function editSpec(Spec $spec) {
-        return view('backend.spec.spec.edit', [
-            'spec' => $spec,
-            'categories' => SpecCategory::all()
-        ]);
+
+public function editSpec(Spec $spec)
+{
+    $spec->load('lists'); // penting! agar data list bisa dipanggil di view
+    return view('backend.spec.spec.edit', [
+        'spec' => $spec,
+        'categories' => SpecCategory::all()
+    ]);
+}
+
+public function updateSpec(Request $request, Spec $spec)
+{
+    $cat = SpecCategory::find($request->catId);
+
+    $formFields = [
+        'name' => $request->name,
+        'type' => $request->type,
+        'unit' => null, // default null
+        'description' => null,
+    ];
+
+    // Set value berdasarkan type
+    switch ($request->type) {
+        case 'price':
+        case 'unit':
+            $formFields['unit'] = $request->unit;
+            break;
+        case 'description':
+            $formFields['description'] = $request->description;
+            break;
+        // list & availability tidak perlu tambahan disini
     }
 
-    public function updateSpec(Request $request, Spec $spec) {
-        $cat = SpecCategory::find($request->catId);
-        $formFields = [
-            'name' => $request->name,
-            'type' => $request->type,
-            'unit' => is_null($request->unit) ? null : $request->unit,
-        ];
+    // Hidden checkbox
+    $formFields['hidden'] = $request->has('hidden');
 
-        $spec->fill($formFields);
-        $spec->specCategory()->associate($cat);
-        $spec->save();
+    // Simpan data
+    $spec->fill($formFields);
+    $spec->specCategory()->associate($cat);
+    $spec->save();
 
-        if (count($request->specLists) > 1 || !is_null($request->specLists[0])) {
-            $spec->lists()->delete();
+    // Handle list jika type == list
+    if ($request->type === 'list') {
+        $spec->lists()->delete(); // bersihkan dulu
+        if (is_array($request->specLists)) {
             foreach ($request->specLists as $list) {
-                if (!is_null($list)) {
+                if (!is_null($list) && trim($list) !== '') {
                     $spec->lists()->create(['list' => $list]);
                 }
             }
         }
-
-        return redirect()->route('backend.spec.index');
     }
+
+    return redirect()->route('backend.spec.index');
+}
 
     public function destroySpec(Spec $spec) {
         $spec->delete();

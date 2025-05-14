@@ -79,36 +79,53 @@
             const dynamicFields = document.getElementById('dynamic-fields');
             dynamicFields.innerHTML = '';
 
-            if (type === 'price') {
+            const oldUnit = @json($spec->unit);
+            const oldDescription = @json($spec->description);
+            const oldLists = @json($spec->lists->pluck('list'));
+
+            if (type === 'price' || type === 'unit') {
                 dynamicFields.innerHTML = `
                     <div class="mb-3">
                         <label for="unit" class="form-label">Specification Unit</label>
-                        <input type="text" class="form-control" name="unit" id="unit" required placeholder="e.g. Rp, USD, ¥">
-                    </div>`;
-            } else if (type === 'unit') {
-                dynamicFields.innerHTML = `
-                    <div class="mb-3">
-                        <label for="unit" class="form-label">Specification Unit</label>
-                        <input type="text" class="form-control" name="unit" id="unit" required placeholder="e.g. Liter, kWh, cc">
+                        <input type="text" class="form-control" name="unit" id="unit" required
+                            placeholder="${type === 'price' ? 'e.g. Rp, USD, ¥' : 'e.g. Liter, kWh, cc'}"
+                            value="${oldUnit ?? ''}">
                     </div>`;
             } else if (type === 'description') {
                 dynamicFields.innerHTML = `
                     <div class="mb-3">
                         <label for="description" class="form-label">Specification Description</label>
-                        <textarea class="form-control" name="description" id="description" rows="3" required></textarea>
+                        <textarea class="form-control" name="description" id="description" rows="3" required>${oldDescription ?? ''}</textarea>
                     </div>`;
             } else if (type === 'list') {
-                dynamicFields.innerHTML = `
-                    <div id="spec-list-wrapper">
+                let listFields = '';
+                if (Array.isArray(oldLists) && oldLists.length > 0) {
+                    oldLists.forEach((val, index) => {
+                        listFields += `
+                            <div class="row mb-2" data-parent>
+                                <div class="col-sm-10">
+                                    <input class="form-control" name="specLists[]" placeholder="Enter list item" required value="${val}">
+                                </div>
+                                <div class="col-sm-2">
+                                    ${index === 0
+                                        ? '<button type="button" class="btn btn-outline-success" onclick="addList()">Add</button>'
+                                        : '<button type="button" class="btn btn-outline-danger" onclick="this.closest(\'.row\').remove()">Remove</button>'}
+                                </div>
+                            </div>`;
+                    });
+                } else {
+                    listFields = `
                         <div class="row mb-2" data-parent>
                             <div class="col-sm-10">
                                 <input class="form-control" name="specLists[]" placeholder="Enter list item" required>
                             </div>
                             <div class="col-sm-2">
-                                <button type="button" class="btn btn-success" onclick="addList()">Add</button>
+                                <button type="button" class="btn btn-outline-success" onclick="addList()">Add</button>
                             </div>
-                        </div>
-                    </div>`;
+                        </div>`;
+                }
+
+                dynamicFields.innerHTML = `<div id="spec-list-wrapper">${listFields}</div>`;
             } else if (type === 'availability') {
                 dynamicFields.innerHTML = `
                     <div class="alert alert-info">Tipe ini dikelola di level kendaraan dan tidak memerlukan input di sini.</div>`;
@@ -129,7 +146,8 @@
             wrapper.appendChild(newRow);
         }
 
-        // Auto-trigger dynamic field if page loaded with selected type
+        // Auto-trigger on load
         window.addEventListener('DOMContentLoaded', handleTypeChange);
     </script>
+
 </x-layouts.backend>

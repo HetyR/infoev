@@ -27,7 +27,7 @@ use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\PrivacyController;
 use App\Http\Controllers\backend\DashboardController;
-
+use App\Http\Controllers\KalkulasiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -232,3 +232,12 @@ Route::post('/vehicle/toggle-love/{id}', [VehicleController::class, 'toggleLove'
 // Tips and Trick
 Route::get('/tips-and-trick', [TipsAndTrickController::class, 'index'])->name('tips.index');
 Route::get('/tips-and-trick/{tips}', [TipsAndTrickController::class, 'show'])->name('tips.show');
+
+// Kalkulasi
+Route::get('/vehicle/kalkulasi/index', [VehicleController::class, 'showKalkulasiForm'])->name('vehicle.kalkulasi.form');
+Route::post('/vehicle/kalkulasi/index', [VehicleController::class, 'processKalkulasi'])->name('vehicle.kalkulasi.process');
+Route::post('/vehicle/kalkulasi', [VehicleController::class, 'processKalkulasi'])->name('vehicle.process-kalkulasi');
+
+
+// Route::get('/kalkulasi', [KalkulasiController::class, 'index'])->name('kalkulasi.index'); // Menampilkan form kalkulasi
+// Route::post('/kalkulasi/hitung', [KalkulasiController::class, 'hitung'])->name('kalkulasi.hitung'); // Menangani proses kalkulasi

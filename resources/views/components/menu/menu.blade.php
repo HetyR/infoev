@@ -19,9 +19,11 @@
             <li>
                 <a href="{{ route('compare.index') }}" class="block px-8 py-4 hover:bg-purple-900 hover:text-white">COMPARE</a>
             </li>
-            <li>
-                <a href="" class="block px-8 py-4 hover:bg-purple-900 hover:text-white">KALKULASI EV</a>
-            </li>
+         <li>
+            <a href="{{ route('vehicle.kalkulasi.form', ['vehicle' => 1]) }}" class="block px-8 py-4 hover:bg-purple-900 hover:text-white">
+                KALKULASI EV
+            </a>
+        </li>
              <li>
                 <a href="" class="block px-8 py-4 hover:bg-purple-900 hover:text-white">CHARGING STATION</a>
             </li>

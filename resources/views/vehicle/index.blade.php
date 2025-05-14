@@ -36,6 +36,7 @@
         <x-menu.title-header title="{{ $title }}" />
     @endif
 
+
     {{-- Product List Container --}}
     <div class="flex-1 [&>:last-child]:mb-3 md:mt-0">
         {{-- Mobile Title --}}
@@ -43,6 +44,22 @@
             <h2 class="pl-3 py-1 border-l-8 border-purple-900 uppercase font-bold text-slate-800">{{ $title }}</h2>
         </div>
         {{-- End Mobile Title --}}
+
+        {{-- Filter by Brand --}}
+        <div class="mt-4 px-3 md:px-6">
+            <form method="GET" class="w-full max-w-xs">
+                <label for="brand" class="block mb-1 text-sm font-semibold text-slate-700">Filter berdasarkan Merek</label>
+                <select name="brand" id="brand" onchange="this.form.submit()" class="w-full border rounded px-3 py-2 shadow-sm focus:outline-none focus:ring focus:ring-purple-200">
+                    <option value="">Semua Merek</option>
+                    @foreach ($brands as $brand)
+                        <option value="{{ $brand->id }}" {{ request('brand') == $brand->id ? 'selected' : '' }}>
+                            {{ $brand->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </form>
+        </div>
+
 
         {{-- Product List --}}
         <div class="grid mt-2 md:mt-0 md:px-6 md:py-3 md:grid-cols-3">

@@ -153,9 +153,83 @@ class VehicleController extends Controller
     return redirect()->back();
 }
 
-    public function showVehicleSpecs($id)
+        public function showVehicleSpecs($id)
+        {
+            $vehicle = Vehicle::find($id);
+            return view('components.vehicle.spec-highlight', ['vehicle' => $vehicle]);
+        }
+
+public function showKalkulasiForm()
+{
+    $vehicles = Vehicle::with('brand')->get();
+
+    $logo = Option::where('type', 'logo')->with('thumbnail')->first();
+    $bikeBrands = Brand::whereHas('vehicles.type', fn ($q) => $q->where('name', 'sepeda motor'))->withCount('vehicles')->having('vehicles_count', '>', 0)->orderByDesc('vehicles_count')->limit(14)->get();
+    $carBrands = Brand::whereHas('vehicles.type', fn ($q) => $q->where('name', 'mobil'))->withCount('vehicles')->having('vehicles_count', '>', 0)->orderByDesc('vehicles_count')->limit(14)->get();
+    $banner = Option::where('type', 'banner')->with('thumbnail')->first();
+    $recentVehicles = Vehicle::with('brand')->latest()->limit(8)->get();
+    $popularVehicles = Vehicle::with('brand')->withCount('views')->orderByDesc('views_count')->limit(10)->get();
+
+    $featured = Blog::with('thumbnail')->latest()->where('published', true)->where('featured', true)->limit(3)->get();
+    $stickies = Blog::with('thumbnail')->join('sticky_articles', 'blogs.id', '=', 'sticky_articles.blog_id')->where('blogs.published', true)->orderBy('sticky_articles.created_at', 'desc')->get();
+
+    $newsLimit = 3 - $featured->count();
+    if ($newsLimit > 0 && $newsLimit <= 3) {
+        $extra = Blog::with('thumbnail')->latest()->where('published', true)->limit($newsLimit)->get();
+        $stickies = $stickies->concat($featured)->concat($extra);
+    }
+
+    return view('vehicle.kalkulasi.index', [
+        'vehicles' => $vehicles,
+        'logo' => $logo,
+        'bikeBrands' => $bikeBrands,
+        'carBrands' => $carBrands,
+        'recentVehicles' => $recentVehicles,
+        'popularVehicles' => $popularVehicles,
+        'stickies' => $stickies,
+        'banner' => $banner?->thumbnail,
+    ]);
+}
+    public function processKalkulasi(Request $request)
     {
-        $vehicle = Vehicle::find($id);
-        return view('components.vehicle.spec-highlight', ['vehicle' => $vehicle]);
+        $request->validate([
+            'vehicle_id' => 'required|exists:vehicles,id',
+            'harga_listrik' => 'required|numeric|min:0',
+            'jarak' => 'nullable|numeric|min:1',
+        ]);
+
+        $vehicle = Vehicle::findOrFail($request->vehicle_id);
+        $specs = $vehicle->specs()->get()->keyBy('name');
+
+        $kapasitas = (float) optional($specs->get('Kapasitas'))->pivot->value;
+        $jarakTempuh = (float) optional($specs->get('Jarak Tempuh'))->pivot->value;
+
+        if ($kapasitas == 0 || $jarakTempuh == 0) {
+            return back()->with('error', 'Data spesifikasi kendaraan tidak lengkap (Kapasitas atau Jarak Tempuh).');
+        }
+
+        $hargaPerKwh = $request->harga_listrik;
+        $kwhPerKm = $kapasitas / $jarakTempuh;
+        $biayaPerKm = $kwhPerKm * $hargaPerKwh;
+        $biayaPer100Km = $biayaPerKm * 100;
+
+        $jarakBulanan = $request->jarak;
+        $biayaBulanan = $jarakBulanan ? $biayaPerKm * $jarakBulanan : null;
+
+        return view('vehicle.kalkulasi.index', [
+            'vehicle' => $vehicle,
+            'result' => [
+                'kwh_per_km' => round($kwhPerKm, 3),
+                'biaya_per_km' => round($biayaPerKm),
+                'biaya_per_100_km' => round($biayaPer100Km),
+                'biaya_bulanan' => $biayaBulanan ? round($biayaBulanan) : null,
+                'harga_kwh' => $hargaPerKwh,
+                'jarak_bulanan' => $jarakBulanan,
+            ],
+        ]);
     }
 }
+
+
+
+

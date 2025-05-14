@@ -129,62 +129,70 @@ class TypeController extends Controller
 
 
 
-    public function show(Type $type) {
+    public function show(Type $type, Request $request)
+    {
+        $selectedBrand = $request->brand;
+
         $stickies = Blog::with('thumbnail')
                         ->select('sticky_articles.*', 'blogs.*')
                         ->join('sticky_articles', 'blogs.id', '=', 'sticky_articles.blog_id')
                         ->where('blogs.published', true)
                         ->orderBy('sticky_articles.created_at', 'desc')
                         ->get();
+
         $featured = Blog::with('thumbnail')
                         ->latest()
                         ->where('published', true)
                         ->where('featured', true)
                         ->limit(3)
                         ->get();
+
         $newsLimit = 3 - $featured->count();
         if ($newsLimit > 0 && $newsLimit <= 3) {
             $remainderArticles = Blog::with('thumbnail')->latest()->where('published', true)->limit($newsLimit)->get();
             $stickies = $stickies->concat($featured)->concat($remainderArticles);
         }
 
+        $brands = Brand::whereHas('vehicles', function ($q) use ($type) {
+            $q->where('type_id', $type->id);
+        })->orderBy('name')->get();
+
+        $vehiclesQuery = Spec::find(1)->vehicles()
+            ->where('type_id', $type->id);
+
+        if ($selectedBrand) {
+            $vehiclesQuery->where('brand_id', $selectedBrand);
+        }
+
         return view('vehicle.index', [
             'bikeBrands' => Brand::limit(14)
-                            ->whereHas('vehicles.type', function (Builder $query) {
-                                $query->where('name', 'sepeda motor');
-                            })
+                            ->whereHas('vehicles.type', fn ($q) => $q->where('name', 'sepeda motor'))
                             ->withCount('vehicles')
                             ->having('vehicles_count', '>', 0)
-                            ->orderBy('vehicles_count', 'desc')
+                            ->orderByDesc('vehicles_count')
                             ->get(),
             'carBrands' => Brand::limit(14)
-                            ->whereHas('vehicles.type', function (Builder $query) {
-                                $query->where('name', 'mobil');
-                            })
+                            ->whereHas('vehicles.type', fn ($q) => $q->where('name', 'mobil'))
                             ->withCount('vehicles')
                             ->having('vehicles_count', '>', 0)
-                            ->orderBy('vehicles_count', 'desc')
+                            ->orderByDesc('vehicles_count')
                             ->get(),
-            'vehicles' => Spec::find(1)
-                            ->vehicles()
-                            ->where('type_id', $type->id)
-                            ->orderByPivot('value', 'desc')
-                            ->paginate(15),
+            'vehicles' => $vehiclesQuery->orderByPivot('value', 'desc')->paginate(15),
+            'brands' => $brands,
+            'selectedBrand' => $selectedBrand,
             'title' => 'Daftar ' . $type->name . ' Listrik',
             'banner' => $type->thumbnail,
             'stickies' => $stickies,
             'recentVehicles' => Vehicle::with('brand')->latest()->limit(8)->get(),
             'popularVehicles' => Vehicle::with('brand')
-                ->whereHas('views', fn (Builder $query) => $query->where('created_at', '>', now()->subMonths(3)))
+                ->whereHas('views', fn ($q) => $q->where('created_at', '>', now()->subMonths(3)))
                 ->withCount('views')
-                ->orderBy('views_count', 'desc')
+                ->orderByDesc('views_count')
                 ->limit(10)
                 ->get(),
             'logo' => Option::where('type', 'logo')->with('thumbnail')->first()
         ]);
     }
-
-
     // public function show(Type $type) {
       
     //     $getImageUrl = function ($image) {

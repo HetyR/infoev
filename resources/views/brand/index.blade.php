@@ -37,23 +37,22 @@
         <x-menu.title-header title="Semua Merek" />
     @endif
 
-    {{-- Brand Filter --}}
-    <div class="mb-4 px-4 md:px-7">
-        <form method="GET" action="{{ route('brand.index') }}" class="flex items-center space-x-4">
-            <div class="flex items-center">
-                <label for="vehicle_type" class="mr-2">Jenis Kendaraan:</label>
-                <select name="type" id="vehicle_type" class="p-2 border rounded">
-                    <option value="">Semua</option>
-                    @foreach ($types as $type)
-                        <option value="{{ $type->id }}" {{ request('type') == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
-                    @endforeach
-                </select>
-            </div>
+{{-- Filter by Vehicle Type --}}
+<div class="mt-4 px-3 md:px-6">
+    <form method="GET" class="w-full max-w-xs">
+        <label for="vehicle_type" class="block mb-1 text-sm font-semibold text-slate-700">Filter berdasarkan Jenis Kendaraan</label>
+        <select name="type" id="vehicle_type" onchange="this.form.submit()" class="w-full border rounded px-3 py-2 shadow-sm focus:outline-none focus:ring focus:ring-purple-200">
+            <option value="">Semua Jenis</option>
+            @foreach ($types as $type)
+                <option value="{{ $type->id }}" {{ request('type') == $type->id ? 'selected' : '' }}>
+                    {{ $type->name }}
+                </option>
+            @endforeach
+        </select>
+    </form>
+</div>
+{{-- End Filter by Vehicle Type --}}
 
-            <button type="submit" class="p-2 bg-purple-900 text-white rounded">Terapkan Filter</button>
-        </form>
-    </div>
-    {{-- End Brand Filter --}}
 
     {{-- Brand Container --}}
     <div class="flex-1 md:mt-0 md:p-3">
