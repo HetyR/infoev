@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Spec;
 use App\Models\SpecCategory;
 use Illuminate\Http\Request;
+use PhpParser\Node\NullableType;
 
 class SpecController extends Controller
 {
@@ -59,13 +60,27 @@ class SpecController extends Controller
     }
 
     public function storeSpec(Request $request) {
-        $formFields = [
-            'name' => $request->name,
-            'type' => $request->type 
-        ];
+    $formFields = [
+        'name' => $request->name,
+        'type' => $request->type,
+        'unit' => null,
+        'description' => null,
+    ];
+
+
         if (!is_null($request->hidden)) {
             $formFields['hidden'] = true;
         }
+
+    switch ($request->type) {
+        case 'price':
+        case 'unit':
+            $formFields['unit'] = $request->unit ?? null;
+            break;
+        case 'description':
+            $formFields['description'] = $request->description ?? null; // boleh kosong
+            break;
+    }
 
         SpecCategory::find($request->catId)
                     ->specs()
@@ -73,6 +88,7 @@ class SpecController extends Controller
 
         return redirect()->route('backend.spec.index');
     }
+
 
 
 public function editSpec(Spec $spec)
@@ -92,8 +108,8 @@ public function updateSpec(Request $request, Spec $spec)
         'name' => $request->name,
         'type' => $request->type,
         'unit' => null, // default null
-        'description' => null,
-    ];
+        'description' => null,    
+];
 
     // Set value berdasarkan type
     switch ($request->type) {

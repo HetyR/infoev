@@ -29,14 +29,21 @@
 
                         <div class="mb-3">
                             <label for="type" class="form-label">Specification Type</label>
-                            <select class="form-select" name="type" id="type" onchange="handleTypeChange()" required>
-                                <option value="" disabled hidden>Select type</option>
-                                <option value="price" @selected($spec->type == 'price')>Price</option>
-                                <option value="unit" @selected($spec->type == 'unit')>Unit</option>
-                                <option value="description" @selected($spec->type == 'description')>Description</option>
-                                <option value="list" @selected($spec->type == 'list')>List</option>
-                                <option value="availability" @selected($spec->type == 'availability')>Availability</option>
-                            </select>
+<select id="type" name="type" class="form-select" onchange="handleTypeChange()"
+    data-old-unit="{{ $spec->unit ?? '' }}"
+    data-old-description="{{ $spec->description ?? '' }}"
+    data-old-lists='@json($spec->lists->pluck("list") ?? [])'>
+    <option value="">-- Pilih Tipe --</option>
+    <option value="unit" {{ $spec->type === 'unit' ? 'selected' : '' }}>Unit</option>
+    <option value="price" {{ $spec->type === 'price' ? 'selected' : '' }}>Price</option>
+    <option value="description" {{ $spec->type === 'description' ? 'selected' : '' }}>Description</option>
+    <option value="list" {{ $spec->type === 'list' ? 'selected' : '' }}>List</option>
+    <option value="availability" {{ $spec->type === 'availability' ? 'selected' : '' }}>Availability</option>
+</select>
+
+
+
+
                         </div>
 
                         <div id="dynamic-fields"></div>
@@ -73,81 +80,84 @@
     </template>
 
     {{-- Script --}}
-    <script>
-        function handleTypeChange() {
-            const type = document.getElementById('type').value;
-            const dynamicFields = document.getElementById('dynamic-fields');
-            dynamicFields.innerHTML = '';
+<script>
+    function handleTypeChange() {
+        const typeElement = document.getElementById('type');
+        const type = typeElement.value;
+        const dynamicFields = document.getElementById('dynamic-fields');
+        dynamicFields.innerHTML = '';
 
-            const oldUnit = @json($spec->unit);
-            const oldDescription = @json($spec->description);
-            const oldLists = @json($spec->lists->pluck('list'));
+        const oldUnit = typeElement.dataset.oldUnit || '';
+        const oldDescription = typeElement.dataset.oldDescription || '';
+        const oldLists = JSON.parse(typeElement.dataset.oldLists || '[]');
 
-            if (type === 'price' || type === 'unit') {
-                dynamicFields.innerHTML = `
-                    <div class="mb-3">
-                        <label for="unit" class="form-label">Specification Unit</label>
-                        <input type="text" class="form-control" name="unit" id="unit" required
-                            placeholder="${type === 'price' ? 'e.g. Rp, USD, ¥' : 'e.g. Liter, kWh, cc'}"
-                            value="${oldUnit ?? ''}">
-                    </div>`;
-            } else if (type === 'description') {
-                dynamicFields.innerHTML = `
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Specification Description</label>
-                        <textarea class="form-control" name="description" id="description" rows="3" required>${oldDescription ?? ''}</textarea>
-                    </div>`;
-            } else if (type === 'list') {
-                let listFields = '';
-                if (Array.isArray(oldLists) && oldLists.length > 0) {
-                    oldLists.forEach((val, index) => {
-                        listFields += `
-                            <div class="row mb-2" data-parent>
-                                <div class="col-sm-10">
-                                    <input class="form-control" name="specLists[]" placeholder="Enter list item" required value="${val}">
-                                </div>
-                                <div class="col-sm-2">
-                                    ${index === 0
-                                        ? '<button type="button" class="btn btn-outline-success" onclick="addList()">Add</button>'
-                                        : '<button type="button" class="btn btn-outline-danger" onclick="this.closest(\'.row\').remove()">Remove</button>'}
-                                </div>
-                            </div>`;
-                    });
-                } else {
-                    listFields = `
+        if (type === 'price' || type === 'unit') {
+            dynamicFields.innerHTML = `
+                <div class="mb-3">
+                    <label for="unit" class="form-label">Specification Unit</label>
+                    <input type="text" class="form-control" name="unit" id="unit" required
+                        placeholder="${type === 'price' ? 'e.g. Rp, USD, ¥' : 'e.g. Liter, kWh, cc'}"
+                        value="${oldUnit}">
+                </div>`;
+        } else if (type === 'description') {
+            dynamicFields.innerHTML = `
+                <div class="mb-3">
+                    <label for="description" class="form-label">Specification Description</label>
+                    <textarea name="description" id="description" class="form-control">{{ old('description', $spec->description ?? '') }}</textarea>
+                </div>`;
+        } else if (type === 'list') {
+            let listFields = '';
+            if (Array.isArray(oldLists) && oldLists.length > 0) {
+                oldLists.forEach((val, index) => {
+                    listFields += `
                         <div class="row mb-2" data-parent>
                             <div class="col-sm-10">
-                                <input class="form-control" name="specLists[]" placeholder="Enter list item" required>
+                                <input class="form-control" name="specLists[]" placeholder="Enter list item" required value="${val}">
                             </div>
                             <div class="col-sm-2">
-                                <button type="button" class="btn btn-outline-success" onclick="addList()">Add</button>
+                                ${index === 0
+                                    ? '<button type="button" class="btn btn-outline-success" onclick="addList()">Add</button>'
+                                    : '<button type="button" class="btn btn-outline-danger" onclick="this.closest(\'.row\').remove()">Remove</button>'}
                             </div>
                         </div>`;
-                }
-
-                dynamicFields.innerHTML = `<div id="spec-list-wrapper">${listFields}</div>`;
-            } else if (type === 'availability') {
-                dynamicFields.innerHTML = `
-                    <div class="alert alert-info">Tipe ini dikelola di level kendaraan dan tidak memerlukan input di sini.</div>`;
+                });
+            } else {
+                listFields = `
+                    <div class="row mb-2" data-parent>
+                        <div class="col-sm-10">
+                            <input class="form-control" name="specLists[]" placeholder="Enter list item" required>
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="button" class="btn btn-outline-success" onclick="addList()">Add</button>
+                        </div>
+                    </div>`;
             }
-        }
 
-        function addList() {
-            const wrapper = document.getElementById('spec-list-wrapper');
-            const newRow = document.createElement('div');
-            newRow.classList.add('row', 'mb-2');
-            newRow.innerHTML = `
-                <div class="col-sm-10">
-                    <input class="form-control" name="specLists[]" placeholder="Enter list item" required>
-                </div>
-                <div class="col-sm-2">
-                    <button type="button" class="btn btn-danger" onclick="this.closest('.row').remove()">Remove</button>
-                </div>`;
-            wrapper.appendChild(newRow);
+            dynamicFields.innerHTML = `<div id="spec-list-wrapper">${listFields}</div>`;
+        } else if (type === 'availability') {
+            dynamicFields.innerHTML = `
+                <div class="alert alert-info">Tipe ini dikelola di level kendaraan dan tidak memerlukan input di sini.</div>`;
         }
+    }
 
-        // Auto-trigger on load
-        window.addEventListener('DOMContentLoaded', handleTypeChange);
-    </script>
+    function addList() {
+        const wrapper = document.getElementById('spec-list-wrapper');
+        const newRow = document.createElement('div');
+        newRow.classList.add('row', 'mb-2');
+        newRow.innerHTML = `
+            <div class="col-sm-10">
+                <input class="form-control" name="specLists[]" placeholder="Enter list item" required>
+            </div>
+            <div class="col-sm-2">
+                <button type="button" class="btn btn-danger" onclick="this.closest('.row').remove()">Remove</button>
+            </div>`;
+        wrapper.appendChild(newRow);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        handleTypeChange();
+    });
+</script>
+
 
 </x-layouts.backend>
