@@ -58,25 +58,24 @@
     </div>
 
     <script>
-        function handleTypeChange() {
-            const type = document.getElementById('type').value;
-            const dynamicFields = document.getElementById('dynamic-fields');
-            dynamicFields.innerHTML = '';
+    function handleTypeChange() {
+        const type = document.getElementById('type').value;
+        const dynamicFields = document.getElementById('dynamic-fields');
+        dynamicFields.innerHTML = '';
 
-            if (type === 'price' || type === 'unit') {
-                const placeholder = type === 'price' ? 'e.g. Rp, USD, ¥' : 'e.g. Liter, kWh, cc';
-                dynamicFields.innerHTML = `
-                    <div class="mb-3">
-                        <label for="unit" class="form-label">Specification Unit</label>
-                        <input type="text" class="form-control" name="unit" id="unit" required placeholder="${placeholder}">
-                    </div>`;
-            } else if (type === 'description') {
-                dynamicFields.innerHTML = `
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Specification Description</label>
-                        <textarea class="form-control" name="description" id="description" rows="3" required></textarea>
-                    </div>`;
-            } else if (type === 'list') {
+        if (type === 'price' || type === 'unit') {
+            dynamicFields.innerHTML = `
+                <div class="mb-3">
+                    <label for="unit" class="form-label">Specification Unit</label>
+                    <input type="text" class="form-control" name="unit" id="unit" placeholder="${type === 'price' ? 'e.g. Rp, USD, ¥' : 'e.g. Liter, kWh, cc'}" required>
+                </div>`;
+        } else if (type === 'description') {
+            dynamicFields.innerHTML = `
+                <div class="mb-3">
+                    <label for="description" class="form-label">Specification Description</label>
+                    <textarea name="description" id="description" class="form-control">{{ old('description', $spec->description ?? '') }}</textarea>
+                </div>`;
+        } else if (type === 'list') {
                 dynamicFields.innerHTML = `
                     <div id="spec-list-wrapper">
                         <div class="row mb-2" data-parent>
