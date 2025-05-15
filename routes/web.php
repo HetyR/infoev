@@ -10,7 +10,7 @@ use App\Http\Controllers\backend\MarketplaceController;
 use App\Http\Controllers\backend\OptionController;
 use App\Http\Controllers\backend\SpecController;
 use App\Http\Controllers\backend\StickyArticleController;
-use App\Http\Controllers\Backend\TipsAndTrickController;
+use App\Http\Controllers\backend\TipsAndTrickController;
 use App\Http\Controllers\backend\TypeController as BackendTypeController;
 use App\Http\Controllers\backend\VehicleController as BackendVehicleController;
 use App\Http\Controllers\BlogController;
