@@ -37,9 +37,9 @@
                                     <td>{{ $post->created_at }}</td>
                                     <td>{{ $post->updated_at }}</td>
                                     <td class="d-flex justify-content-center align-items-center gap-2">
-                                        <a href="{{ route('backend.blog.edit', ['blog' => $post->slug]) }}" class="btn btn-sm btn-outline-warning custom-hover">
-                                            <i class="fas fa-edit me-1"></i> Edit
-                                        </a>
+                                      <a href="{{ route('backend.blog.edit', ['blog' => $post->slug]) }}" class="btn btn-sm btn-outline-warning">
+            <i class="fas fa-edit me-1"></i> Edit
+        </a>
                                         <form class="d-inline-block" action="{{ route('backend.blog.destroy', ['blog' => $post->slug]) }}" onsubmit="return confirm('Delete this post?')" method="POST">
                                             @csrf
                                             @method('DELETE')

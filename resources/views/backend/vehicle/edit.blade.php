@@ -171,9 +171,9 @@
                             </div>
                             <div class="col-sm-2">
                                 @if ($loop->index == 0)
-                                    <button type="button" class="btn btn-success" onclick="addSpec()">Add</button>
+                                    <button type="button" class="btn btn-outline-success" onclick="addSpec()">Add</button>
                                 @else
-                                    <button type="button" class="btn btn-danger" onclick="removeSpec(this)">Remove</button>
+                                    <button type="button" class="btn btn-outline-danger" onclick="removeSpec(this)">Remove</button>
                                 @endif
                             </div>
                         </div>
