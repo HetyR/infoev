@@ -160,23 +160,31 @@ class BrandController extends Controller
                 ->get();
             $stickies = $stickies->concat($featured)->concat($remainderArticles);
         }
-        $spec = Spec::find(1);
-        if ($spec) {
-            $vehicles = $spec->vehicles()
-                ->where('brand_id', $brand->id)
-                ->orderByPivot('value', 'desc')
-                ->paginate(15);
-        } else {
-            // Fallback: return all vehicles for the brand (no spec filtering)
-            $vehicles = Vehicle::where('brand_id', $brand->id)
-                ->paginate(15);
-        }
 
+            $spec = Spec::first();
+
+    if ($spec) {
+        $vehicles = $spec->vehicles()
+            ->where('brand_id', $brand->id)
+            ->orderByPivot('value', 'desc')
+            ->paginate(15);
+    } else {
+        // Fallback jika tidak ada spec
+        $vehicles = Vehicle::where('brand_id', $brand->id)
+            ->paginate(15);
+    }
+        
         return view('vehicle.index', [
             'title' => $brand->name,
             'banner' => $brand->thumbnail,
+            'vehicles' => $vehicles,
 
-
+            // Data kendaraan berdasarkan brand dan spesifikasi default (id = 1)
+            // 'vehicles' => Spec::find(1)
+            //     ->vehicles()
+            //     ->where('brand_id', $brand->id)
+            //     ->orderByPivot('value', 'desc')
+            //     ->paginate(15),
 
             // Dropdown filter merek
             'brands' => Brand::whereHas('vehicles')->get(),
