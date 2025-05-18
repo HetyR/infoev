@@ -62,6 +62,7 @@ class VehicleController extends Controller
     }
 
     public function store(Request $request) {
+        dd($request->all());
         $typeId = $request->type;
         $brandId = $request->brand;
 

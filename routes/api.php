@@ -14,6 +14,16 @@ use App\Http\Controllers\Api\ListController;
 use App\Http\Controllers\Api\ChargerStationController;
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Api\SpecTestController;
+
+
+// Route Testing
+Route::prefix('v2')->group(function () {
+    Route::get('/spec-categories', [SpecTestController::class, 'getSpecCategories']);
+    Route::get('/specs', [SpecTestController::class, 'getSpecs']);
+    Route::get('/spec-lists', [SpecTestController::class, 'getSpecLists']);
+});
+
 
 
 /*
@@ -70,12 +80,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         ->name('blog.show');
     Route::get('/berita', [BlogController::class, 'index'])
         ->name('blog.index');
+    //Update Blog
+    Route::post('/blogs', [BlogController::class, 'store']);
 
     // Brand
     Route::get('/merek/{brand}', [BrandController::class, 'show'])
         ->name('brand.show');
     Route::get('/merek', [BrandController::class, 'index'])
         ->name('brand.index');
+    // Update Brand
+    Route::post('/merek', [BrandController::class, 'store']);
 
     // Type
     Route::get('/tipe/{type}', [TypeController::class, 'show'])
@@ -86,6 +100,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     // Vehicle
     Route::get('/{vehicle}', [VehicleController::class, 'show'])
         ->name('vehicle.show');
+    // Update Vehicle
+    Route::post('/vehicles', [VehicleController::class, 'store']);
+
+
     Route::post('/comment/store', [CommentController::class, 'store'])
         ->name('comment.post');
 
