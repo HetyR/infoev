@@ -15,10 +15,10 @@ class BrandController extends Controller
 {
     public function index() {
       
-    
+        // Update Untuk Testing
         $items = Brand::orderBy('name')
                       ->withCount('vehicles')
-                      ->having('vehicles_count', '>', 0)
+                    //   ->having('vehicles_count', '>', 0)
                       ->get();
     
        
@@ -129,5 +129,32 @@ class BrandController extends Controller
             'name_brand' => $brand->name,
             'banner' => $bannerUrl,
         ]);
+    }
+
+    public function store(Request $request)
+    {
+        // Validasi request
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'banner' => 'required|image|max:2048', 
+        ]);
+
+        $formFields = [
+            'name' => $request->name,
+        ];
+
+        $brand = Brand::create($formFields);
+
+        if ($request->hasFile('banner')) {
+            $brand->thumbnail()->create([
+                'path' => $request->file('banner')->store('banner', 'public'),
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Brand created successfully',
+            'data' => $brand->load('thumbnail'), // memuat relasi thumbnail
+        ], 201);
     }
 }    

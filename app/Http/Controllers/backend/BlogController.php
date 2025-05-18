@@ -78,7 +78,8 @@ class BlogController extends Controller
     {
         $formFields = [
             'title' => $request->title,
-            'slug' => $request->slug ?? $blog->status,
+            // 'slug' => $request->slug ?? $blog->status,
+            'slug' => $request->filled('slug') ? Str::slug($request->slug) : $blog->slug, // gunakan slug request, jika tidak ada pakai slug lama
             'summary' => $request->summary,
             'content' => $request->content,
             'published' => $request->status,

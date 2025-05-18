@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Contracts\Database\Eloquent\Builder; 
+use Illuminate\Support\Facades\Validator;
 
 use App\Models\Blog;
 use App\Models\Brand;
@@ -74,6 +75,47 @@ class BlogController extends Controller
                 'stickies' => $stickies,
                 
             ]);
+        }
+
+        public function store(Request $request)
+        {
+            $validator = Validator::make($request->all(), [
+                'title'     => 'required|string|max:255',
+                'summary'   => 'nullable|string',
+                'content'   => 'required|string',
+                // 'status'    => 'required|boolean',
+                // 'featured'  => 'nullable|boolean',
+                // 'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' => 'Validation error',
+                    'errors'  => $validator->errors()
+                ], 422);
+            }
+
+            $formFields = [
+                'title'     => $request->title,
+                'summary'   => $request->summary,
+                'content'   => $request->content,
+                'published' => true,
+                'featured'  => false
+            ];
+
+            $blog = Blog::create($formFields);
+
+            if ($request->hasFile('thumbnail')) {
+                $path = $request->file('thumbnail')->store('blog', 'public');
+                $blog->thumbnail()->create([
+                    'path' => $path
+                ]);
+            }
+
+            return response()->json([
+                'message' => 'Blog created successfully',
+                'data'    => $blog->load('thumbnail')
+            ], 201);
         }
     
 
