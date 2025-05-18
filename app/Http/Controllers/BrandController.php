@@ -177,7 +177,7 @@ class BrandController extends Controller
         return view('vehicle.index', [
             'title' => $brand->name,
             'banner' => $brand->thumbnail,
-            'vehicles' => $vehicles,
+                'vehicles' => $vehicles,
 
             // Data kendaraan berdasarkan brand dan spesifikasi default (id = 1)
             // 'vehicles' => Spec::find(1)
