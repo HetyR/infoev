@@ -149,7 +149,7 @@
                 <input class="form-control" name="specLists[]" placeholder="Enter list item" required>
             </div>
             <div class="col-sm-2">
-                <button type="button" class="btn btn-danger" onclick="this.closest('.row').remove()">Remove</button>
+                <button type="button" class="btn btn-outline-danger" onclick="this.closest('.row').remove()">Remove</button>
             </div>`;
         wrapper.appendChild(newRow);
     }

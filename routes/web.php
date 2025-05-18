@@ -210,6 +210,7 @@ Route::middleware('auth')->group(function () {
 
 // Compare
 Route::get('/compare', [CompareController::class, 'index'])->name('compare.index');
+Route::post('/compare/add', [CompareController::class, 'addToCompare'])->name('compare.add');
 Route::post('/compare', [CompareController::class, 'index'])->name('compare.result');
 
 // Finder
@@ -218,26 +219,32 @@ Route::get('/finder/search', [FinderController::class, 'search'])->name('finder.
 Route::get('/finder/brands', [FinderController::class, 'getBrandsByType'])->name('finder.getBrandsByType');
 
 // Frontend Route
-Route::get('/cari', [HomeController::class, 'search'])->name('search');
-Route::get('/berita/{blog}', [BlogController::class, 'show'])->name('blog.show');
-Route::get('/berita', [BlogController::class, 'index'])->name('blog.index');
-Route::get('/merek/{brand}', [BrandController::class, 'show'])->name('brand.show');
-Route::get('/merek', [BrandController::class, 'index'])->name('brand.index');
-Route::get('/tipe/{type}', [TypeController::class, 'show'])->name('type.show');
-Route::get('/tipe', [TypeController::class, 'index'])->name('type.index');
-Route::get('/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
-Route::post('/comment/store', [CommentController::class, 'store'])->name('comment.post');
-Route::post('/vehicle/toggle-love/{id}', [VehicleController::class, 'toggleLove'])->name('vehicle.toggleLove');
+        Route::get('/cari', [HomeController::class, 'search'])->name('search');
+        Route::get('/berita/{blog}', [BlogController::class, 'show'])->name('blog.show');
+        Route::get('/berita', [BlogController::class, 'index'])->name('blog.index');
+        Route::get('/merek/{brand}', [BrandController::class, 'show'])->name('brand.show');
+        Route::get('/merek', [BrandController::class, 'index'])->name('brand.index');
+        Route::get('/tipe/{type}', [TypeController::class, 'show'])->name('type.show');
+        Route::get('/tipe', [TypeController::class, 'index'])->name('type.index');
+        Route::get('/kalkulasi', [KalkulasiController::class, 'index'])->name('kalkulasi.index');
+        Route::get('/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
+        Route::post('/comment/store', [CommentController::class, 'store'])->name('comment.post');
+        Route::post('/vehicle/toggle-love/{id}', [VehicleController::class, 'toggleLove'])->name('vehicle.toggleLove');
 
 // Tips and Trick
 Route::get('/tips-and-trick', [TipsAndTrickController::class, 'index'])->name('tips.index');
 Route::get('/tips-and-trick/{tips}', [TipsAndTrickController::class, 'show'])->name('tips.show');
 
 // Kalkulasi
-Route::get('/vehicle/kalkulasi/index', [VehicleController::class, 'showKalkulasiForm'])->name('vehicle.kalkulasi.form');
-Route::post('/vehicle/kalkulasi/index', [VehicleController::class, 'processKalkulasi'])->name('vehicle.kalkulasi.process');
-Route::post('/vehicle/kalkulasi', [VehicleController::class, 'processKalkulasi'])->name('vehicle.process-kalkulasi');
+// Route::get('/vehicle/kalkulasi/index', [VehicleController::class, 'showKalkulasiForm'])->name('vehicle.kalkulasi.form');
+// Route::post('/vehicle/kalkulasi/index', [VehicleController::class, 'processKalkulasi'])->name('vehicle.kalkulasi.process');
+// Route::post('/vehicle/kalkulasi', [VehicleController::class, 'processKalkulasi'])->name('vehicle.process-kalkulasi');
 
 
 // Route::get('/kalkulasi', [KalkulasiController::class, 'index'])->name('kalkulasi.index'); // Menampilkan form kalkulasi
 // Route::post('/kalkulasi/hitung', [KalkulasiController::class, 'hitung'])->name('kalkulasi.hitung'); // Menangani proses kalkulasi
+
+
+// routes/web.php
+
+// routes/api.php

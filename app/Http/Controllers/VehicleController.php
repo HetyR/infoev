@@ -23,24 +23,27 @@ use Illuminate\Support\Facades\Response;
 class VehicleController extends Controller
 {
 
-    public function show(Vehicle $vehicle) {
+    public function show(Vehicle $vehicle)
+    {
 
         if ($vehicle->name == 'all') abort(404);
 
-        $specCategories = SpecCategory::with(['specs',
-                        'specs.vehicles' => function ($query) use ($vehicle) {
-                            $query->where('vehicles.id', $vehicle->id);
-                        }])
-                        ->whereRelation('specs.vehicles', 'vehicles.id', $vehicle->id)
-                        ->orderBy('priority')
-                        ->get();
+        $specCategories = SpecCategory::with([
+            'specs',
+            'specs.vehicles' => function ($query) use ($vehicle) {
+                $query->where('vehicles.id', $vehicle->id);
+            }
+        ])
+            ->whereRelation('specs.vehicles', 'vehicles.id', $vehicle->id)
+            ->orderBy('priority')
+            ->get();
 
         $highlightSpecIds = Spec::where('name', 'kapasitas')
-                                ->orWhere('name', 'pengisian daya ac')
-                                ->orWhere('name', 'kecepatan maksimal')
-                                ->orWhere('name', 'jarak tempuh')
-                                ->get()
-                                ->pluck('id');
+            ->orWhere('name', 'pengisian daya ac')
+            ->orWhere('name', 'kecepatan maksimal')
+            ->orWhere('name', 'jarak tempuh')
+            ->get()
+            ->pluck('id');
         $specs = Vehicle::find($vehicle->id)->specs()->wherePivotIn('spec_id', $highlightSpecIds)->get();
         $highlightSpecs = [];
 
@@ -76,17 +79,17 @@ class VehicleController extends Controller
         }
 
         $stickies = Blog::with('thumbnail')
-                        ->select('sticky_articles.*', 'blogs.*') // Perbaiki penulisan kolom
-                        ->join('sticky_articles', 'blogs.id', '=', 'sticky_articles.blog_id')
-                        ->where('blogs.published', true)
-                        ->orderBy('sticky_articles.created_at', 'desc')
-                        ->get();
+            ->select('sticky_articles.*', 'blogs.*') // Perbaiki penulisan kolom
+            ->join('sticky_articles', 'blogs.id', '=', 'sticky_articles.blog_id')
+            ->where('blogs.published', true)
+            ->orderBy('sticky_articles.created_at', 'desc')
+            ->get();
         $featured = Blog::with('thumbnail')
-                        ->latest()
-                        ->where('published', true)
-                        ->where('featured', true)
-                        ->limit(3)
-                        ->get();
+            ->latest()
+            ->where('published', true)
+            ->where('featured', true)
+            ->limit(3)
+            ->get();
         $newsLimit = 3 - $featured->count();
         if ($newsLimit > 0 && $newsLimit <= 3) {
             $remainderArticles = Blog::with('thumbnail')->latest()->where('published', true)->limit($newsLimit)->get();
@@ -100,21 +103,24 @@ class VehicleController extends Controller
 
         return view('vehicle.show', [
             'bikeBrands' => Brand::limit(14)
-                            ->whereHas('vehicles.type', function (Builder $query) {
-                                $query->where('name', 'sepeda motor');
-                            })
-                            ->withCount('vehicles')
-                            ->having('vehicles_count', '>', 0)
-                            ->orderBy('vehicles_count', 'desc')
-                            ->get(),
+                ->whereHas('vehicles.type', function (Builder $query) {
+                    $query->where('name', 'sepeda motor');
+                })
+                ->withCount('vehicles')
+                ->having('vehicles_count', '>', 0)
+                ->orderBy('vehicles_count', 'desc')
+                ->get(),
             'carBrands' => Brand::limit(14)
-                            ->whereHas('vehicles.type', function (Builder $query) {
-                                $query->where('name', 'mobil');
-                            })
-                            ->withCount('vehicles')
-                            ->having('vehicles_count', '>', 0)
-                            ->orderBy('vehicles_count', 'desc')
-                            ->get(),
+                ->whereHas('vehicles.type', function (Builder $query) {
+                    $query->where('name', 'mobil');
+                })
+                ->withCount('vehicles')
+                ->having('vehicles_count', '>', 0)
+                ->orderBy('vehicles_count', 'desc')
+                ->get(),
+            'brands' => Brand::whereHas('vehicles', function ($query) use ($vehicle) {
+                $query->where('type_id', $vehicle->type_id);
+            })->get(),
             'specCategories' => $specCategories,
             'highlightSpecs' => $highlightSpecs,
             'vehicle' => $vehicle,
@@ -123,7 +129,7 @@ class VehicleController extends Controller
             'stickies' => $stickies,
             'recentVehicles' => Vehicle::with('brand')->latest()->limit(8)->get(),
             'popularVehicles' => Vehicle::with('brand')
-                ->whereHas('views', fn (Builder $query) => $query->where('created_at', '>', now()->subMonths(3)))
+                ->whereHas('views', fn(Builder $query) => $query->where('created_at', '>', now()->subMonths(3)))
                 ->withCount('views')
                 ->orderBy('views_count', 'desc')
                 ->limit(10)
@@ -133,63 +139,63 @@ class VehicleController extends Controller
     }
 
     public function toggleLove($id)
-{
-    $user = auth()->user();
-    $vehicle = Vehicle::findOrFail($id);
+    {
+        $user = auth()->user();
+        $vehicle = Vehicle::findOrFail($id);
 
-    $lovedVehicle = LovedVehicle::where('vehicle_id', $vehicle->id)
-        ->where('user_id', $user->id)
-        ->first();
+        $lovedVehicle = LovedVehicle::where('vehicle_id', $vehicle->id)
+            ->where('user_id', $user->id)
+            ->first();
 
-    if ($lovedVehicle) {
-        $lovedVehicle->delete();
-    } else {
-        LovedVehicle::create([
-            'vehicle_id' => $vehicle->id,
-            'user_id' => $user->id,
-        ]);
-    }
-
-    return redirect()->back();
-}
-
-        public function showVehicleSpecs($id)
-        {
-            $vehicle = Vehicle::find($id);
-            return view('components.vehicle.spec-highlight', ['vehicle' => $vehicle]);
+        if ($lovedVehicle) {
+            $lovedVehicle->delete();
+        } else {
+            LovedVehicle::create([
+                'vehicle_id' => $vehicle->id,
+                'user_id' => $user->id,
+            ]);
         }
 
-public function showKalkulasiForm()
-{
-    $vehicles = Vehicle::with('brand')->get();
-
-    $logo = Option::where('type', 'logo')->with('thumbnail')->first();
-    $bikeBrands = Brand::whereHas('vehicles.type', fn ($q) => $q->where('name', 'sepeda motor'))->withCount('vehicles')->having('vehicles_count', '>', 0)->orderByDesc('vehicles_count')->limit(14)->get();
-    $carBrands = Brand::whereHas('vehicles.type', fn ($q) => $q->where('name', 'mobil'))->withCount('vehicles')->having('vehicles_count', '>', 0)->orderByDesc('vehicles_count')->limit(14)->get();
-    $banner = Option::where('type', 'banner')->with('thumbnail')->first();
-    $recentVehicles = Vehicle::with('brand')->latest()->limit(8)->get();
-    $popularVehicles = Vehicle::with('brand')->withCount('views')->orderByDesc('views_count')->limit(10)->get();
-
-    $featured = Blog::with('thumbnail')->latest()->where('published', true)->where('featured', true)->limit(3)->get();
-    $stickies = Blog::with('thumbnail')->join('sticky_articles', 'blogs.id', '=', 'sticky_articles.blog_id')->where('blogs.published', true)->orderBy('sticky_articles.created_at', 'desc')->get();
-
-    $newsLimit = 3 - $featured->count();
-    if ($newsLimit > 0 && $newsLimit <= 3) {
-        $extra = Blog::with('thumbnail')->latest()->where('published', true)->limit($newsLimit)->get();
-        $stickies = $stickies->concat($featured)->concat($extra);
+        return redirect()->back();
     }
 
-    return view('vehicle.kalkulasi.index', [
-        'vehicles' => $vehicles,
-        'logo' => $logo,
-        'bikeBrands' => $bikeBrands,
-        'carBrands' => $carBrands,
-        'recentVehicles' => $recentVehicles,
-        'popularVehicles' => $popularVehicles,
-        'stickies' => $stickies,
-        'banner' => $banner?->thumbnail,
-    ]);
-}
+    public function showVehicleSpecs($id)
+    {
+        $vehicle = Vehicle::find($id);
+        return view('components.vehicle.spec-highlight', ['vehicle' => $vehicle]);
+    }
+
+    public function showKalkulasiForm()
+    {
+        $vehicles = Vehicle::with('brand')->get();
+
+        $logo = Option::where('type', 'logo')->with('thumbnail')->first();
+        $bikeBrands = Brand::whereHas('vehicles.type', fn($q) => $q->where('name', 'sepeda motor'))->withCount('vehicles')->having('vehicles_count', '>', 0)->orderByDesc('vehicles_count')->limit(14)->get();
+        $carBrands = Brand::whereHas('vehicles.type', fn($q) => $q->where('name', 'mobil'))->withCount('vehicles')->having('vehicles_count', '>', 0)->orderByDesc('vehicles_count')->limit(14)->get();
+        $banner = Option::where('type', 'banner')->with('thumbnail')->first();
+        $recentVehicles = Vehicle::with('brand')->latest()->limit(8)->get();
+        $popularVehicles = Vehicle::with('brand')->withCount('views')->orderByDesc('views_count')->limit(10)->get();
+
+        $featured = Blog::with('thumbnail')->latest()->where('published', true)->where('featured', true)->limit(3)->get();
+        $stickies = Blog::with('thumbnail')->join('sticky_articles', 'blogs.id', '=', 'sticky_articles.blog_id')->where('blogs.published', true)->orderBy('sticky_articles.created_at', 'desc')->get();
+
+        $newsLimit = 3 - $featured->count();
+        if ($newsLimit > 0 && $newsLimit <= 3) {
+            $extra = Blog::with('thumbnail')->latest()->where('published', true)->limit($newsLimit)->get();
+            $stickies = $stickies->concat($featured)->concat($extra);
+        }
+
+        return view('vehicle.kalkulasi.index', [
+            'vehicles' => $vehicles,
+            'logo' => $logo,
+            'bikeBrands' => $bikeBrands,
+            'carBrands' => $carBrands,
+            'recentVehicles' => $recentVehicles,
+            'popularVehicles' => $popularVehicles,
+            'stickies' => $stickies,
+            'banner' => $banner?->thumbnail,
+        ]);
+    }
     public function processKalkulasi(Request $request)
     {
         $request->validate([
@@ -229,7 +235,3 @@ public function showKalkulasiForm()
         ]);
     }
 }
-
-
-
-

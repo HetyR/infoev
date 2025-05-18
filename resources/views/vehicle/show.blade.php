@@ -30,13 +30,23 @@
 
     {{-- Content Section --}}
     {{-- Title Header --}}
-{{-- Title Header --}}
-@if (isset($pictures) && !is_null($pictures) )
-    <x-vehicle.title-header :img="$pictures" title="{{ $vehicle->brand->name }} {{ $vehicle->name }}" />
-@else
-    <x-vehicle.title-header title="{{ $vehicle->brand->name }} {{ $vehicle->name }}" />
-@endif
-{{-- End Title Header --}}
+    {{-- Title Header --}}
+    @if (isset($pictures) && !is_null($pictures))
+        <x-vehicle.title-header :img="$pictures" title="{!! $vehicle->brand->name !!} {!! $vehicle->name !!}" />
+    @else
+        <x-vehicle.title-header title="{{ $vehicle->brand->name }} {{ $vehicle->name }}" />
+    @endif
+    {{-- End Title Header --}}
+   {{-- Tombol Compare --}}
+ <div class="px-6 mb-4">
+<form action="{{ route('compare.add') }}" method="POST">
+    @csrf
+    <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
+    <button type="submit">Tambah ke Compare</button>
+</form>
+
+</div>
+
 
     {{-- Product Detail Container --}}
     <div class="flex-1 md:mt-0">

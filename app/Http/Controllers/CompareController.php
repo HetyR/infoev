@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Compare;
@@ -70,7 +71,8 @@ class CompareController extends Controller
 
         // Mengambil semua merk
         $brands = Brand::all();
-
+        $compareList = session()->get('compare_list', []);
+        $comparedVehicles = Vehicle::whereIn('id', $compareList)->with('brand')->get();
         // Menggabungkan daftar kendaraan dan merk untuk ditampilkan
         $combinedList = $vehicles->map(function ($vehicle) { //fungsi ini menerapkan callback pada setiap elemen dari koleksi
             return [
@@ -138,7 +140,7 @@ class CompareController extends Controller
             'banner' => is_null($banner) || is_null($banner->thumbnail) ? null : $banner->thumbnail,
             'recentVehicles' => Vehicle::with('brand')->latest()->limit(8)->get(),
             'popularVehicles' => Vehicle::with('brand')
-                ->whereHas('views', fn (\Illuminate\Database\Eloquent\Builder $query) => $query->where('created_at', '>', now()->subMonths(3)))
+                ->whereHas('views', fn(\Illuminate\Database\Eloquent\Builder $query) => $query->where('created_at', '>', now()->subMonths(3)))
                 ->withCount('views')
                 ->orderBy('views_count', 'desc')
                 ->limit(10)
@@ -150,9 +152,11 @@ class CompareController extends Controller
             'specCategories' => $specCategories,
             'brands' => $brands,
             'combinedList' => $combinedList,
-            'errorMessage' => $errorMessage, // Tambahkan pesan kesalahan ke view
+            'errorMessage' => $errorMessage,
+            'comparedVehicles' => $comparedVehicles
         ]);
     }
+
 
     // Method untuk menampilkan detail kendaraan
     public function showVehicle($id)
@@ -163,4 +167,19 @@ class CompareController extends Controller
         // Menampilkan view 'vehicle.show' dengan data kendaraan
         return view('vehicle.show', compact('vehicle'));
     }
+
+public function addToCompare(Request $request)
+{
+    $vehicleId = $request->input('vehicle_id');
+    $compareList = session()->get('compare_list', []);
+
+    if (!in_array($vehicleId, $compareList)) {
+        $compareList[] = $vehicleId;
+        session(['compare_list' => $compareList]);
+    }
+
+    session()->flash('success', 'Vehicle added to compare list!');
+    return redirect()->route('compare.index'); // redirect ke halaman compare
+}
+
 }

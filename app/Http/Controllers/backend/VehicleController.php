@@ -16,40 +16,47 @@ use Illuminate\Support\Facades\Storage;
 
 class VehicleController extends Controller
 {
-    public function index(Request $request)
-    {
-        // perubahan di controller fungsi index karena ada tambahan filter
-        $typeId = $request->input('type_id');
-        $brandId = $request->input('brand_id');
-        $marketplaceId = $request->input('marketplace_id');
+public function index(Request $request)
+{
+    $typeId = $request->input('type_id');
+    $brandId = $request->input('brand_id');
+    $marketplaceId = $request->input('marketplace_id');
 
-        $query = Vehicle::query();
+    // Query kendaraan
+    $query = Vehicle::query();
 
+    if ($typeId) {
+        $query->where('type_id', $typeId);
+    }
+
+    if ($brandId) {
+        $query->where('brand_id', $brandId);
+    }
+
+    if ($marketplaceId === 'none') {
+        $query->whereDoesntHave('affiliate');
+    } elseif ($marketplaceId) {
+        $query->whereHas('affiliate', function ($q) use ($marketplaceId) {
+            $q->where('marketplace_id', $marketplaceId);
+        });
+    }
+
+    $vehicles = $query->get();
+
+    $filteredBrands = Brand::whereHas('vehicles', function ($query) use ($typeId) {
         if ($typeId) {
             $query->where('type_id', $typeId);
         }
+    })->get();
 
-        if ($brandId) {
-            $query->where('brand_id', $brandId);
-        }
+    return view('backend.vehicle.index', [
+        'vehicles' => $vehicles,
+        'types' => Type::all(),
+        'brands' => $filteredBrands, 
+        'marketplaces' => Marketplace::all(),
+    ]);
+}
 
-        if ($marketplaceId === 'none') {
-            $query->whereDoesntHave('affiliate');
-        } elseif ($marketplaceId) {
-            $query->whereHas('affiliate', function ($q) use ($marketplaceId) {
-                $q->where('marketplace_id', $marketplaceId);
-            });
-        }
-
-        $vehicles = $query->get();
-
-        return view('backend.vehicle.index', [
-            'vehicles' => $vehicles,
-            'types' => Type::all(),
-            'brands' => Brand::all(),
-            'marketplaces' => Marketplace::all(),
-        ]);
-    }
 
     public function create() {
         return view('backend.vehicle.create', [

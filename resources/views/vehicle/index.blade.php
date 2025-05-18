@@ -2,7 +2,7 @@
     <x-slot:title>{{ $title }} - InfoEV</x-slot>
 
     <x-slot:meta>
-
+        {{-- Meta tags bisa ditambahkan di sini --}}
     </x-slot>
 
     {{-- Header --}}
@@ -29,13 +29,12 @@
     {{-- End Sidebar --}}
 
     {{-- Content Section --}}
-	{{-- Title Header --}}
+    {{-- Title Header --}}
     @if (isset($banner) && !is_null($banner))
         <x-menu.title-header :img="$banner" title="{{ $title }}" />
     @else
         <x-menu.title-header title="{{ $title }}" />
     @endif
-
 
     {{-- Product List Container --}}
     <div class="flex-1 [&>:last-child]:mb-3 md:mt-0">
@@ -52,7 +51,7 @@
                 <select name="brand" id="brand" onchange="this.form.submit()" class="w-full border rounded px-3 py-2 shadow-sm focus:outline-none focus:ring focus:ring-purple-200">
                     <option value="">Semua Merek</option>
                     @foreach ($brands as $brand)
-                        <option value="{{ $brand->id }}" {{ request('brand') == $brand->id ? 'selected' : '' }}>
+                        <option value="{{ $brand->id }}" {{ (string) request('brand') === (string) $brand->id ? 'selected' : '' }}>
                             {{ $brand->name }}
                         </option>
                     @endforeach
@@ -60,10 +59,8 @@
             </form>
         </div>
 
-
         {{-- Product List --}}
         <div class="grid mt-2 md:mt-0 md:px-6 md:py-3 md:grid-cols-3">
-
             @unless ($vehicles->isEmpty())
                 @foreach ($vehicles as $vehicle)
                     <x-vehicle.list :vehicle="$vehicle" />
@@ -73,7 +70,6 @@
                     Kendaraan tidak ditemukan
                 </div>
             @endunless
-
         </div>
         {{-- End Product List --}}
 

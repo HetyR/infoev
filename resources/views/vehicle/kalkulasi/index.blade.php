@@ -17,119 +17,298 @@
         <x-sidebar.featured :featuredArticles="$stickies" />
     </x-slot:sidebar>
 
+    <x-slot:footer>
+        <x-menu.footer :logo="$logo" />
+    </x-slot:footer>
+
     @if (isset($banner))
         <x-menu.title-header :img="$banner" title="Kalkulasi Biaya Kendaraan Listrik" />
     @else
         <x-menu.title-header title="Kalkulasi Biaya Kendaraan Listrik" />
     @endif
 
-    {{-- Konten Form Kalkulasi --}}
-    <div class="mt-4 px-3 md:px-6 max-w-2xl">
-        <form method="POST" action="{{ route('vehicle.process-kalkulasi') }}" class="bg-white p-6 rounded shadow">
-            @csrf
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold text-center mb-8">Kalkulator Biaya Kendaraan Listrik</h1>
 
-            {{-- Jenis Kendaraan --}}
-            <div class="mb-4">
-                <label class="block text-sm font-bold mb-1">Jenis Kendaraan</label>
-                <select id="jenis_kendaraan" class="w-full border px-3 py-2" name="jenis_kendaraan" required>
-                    <option value="">-- Pilih Jenis --</option>
-                    <option value="Mobil" {{ old('jenis_kendaraan') == 'Mobil' ? 'selected' : '' }}>Mobil Listrik</option>
-                    <option value="Motor" {{ old('jenis_kendaraan') == 'Motor' ? 'selected' : '' }}>Motor Listrik</option>
-                </select>
+            <div id="ev-calculator" class="bg-white rounded-lg shadow-lg p-6">
+                <div id="alert-error" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                    <p id="error-message"></p>
+                </div>
+
+                <form id="calculator-form">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="vehicle-type" class="block text-gray-700 font-bold mb-2">Pilih Tipe Kendaraan</label>
+                            <select id="vehicle-type" class="block w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                <option value="">-- Pilih Tipe --</option>
+                                @foreach($types as $type)
+                                    <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="vehicle-brand" class="block text-gray-700 font-bold mb-2">Pilih Brand</label>
+                            <select id="vehicle-brand" class="block w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled required>
+                                <option value="">-- Pilih Brand --</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="vehicle-model" class="block text-gray-700 font-bold mb-2">Pilih Model Kendaraan</label>
+                            <select id="vehicle-model" class="block w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled required>
+                                <option value="">-- Pilih Model --</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="daily-distance" class="block text-gray-700 font-bold mb-2">Jarak Tempuh Harian (km)</label>
+                            <input type="number" id="daily-distance" class="block w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value="50" min="0" required />
+                        </div>
+
+                        <div>
+                            <label for="electricity-price" class="block text-gray-700 font-bold mb-2">Harga Listrik (Rp/kWh)</label>
+                            <input type="number" id="electricity-price" class="block w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value="1445" min="0" required />
+                        </div>
+                    </div>
+
+                    <div id="vehicle-specs" class="hidden mb-6 p-4 bg-gray-50 rounded-md">
+                        <h3 class="font-bold mb-2">Spesifikasi Kendaraan</h3>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <p class="text-sm text-gray-600">Model: <span id="spec-model"></span></p>
+                                <p class="text-sm text-gray-600">Brand: <span id="spec-brand"></span></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Kapasitas Baterai: <span id="spec-battery"></span> kWh</p>
+                                <p class="text-sm text-gray-600">Konsumsi Energi: <span id="spec-consumption"></span> kWh/100km</p>
+                                <p class="text-sm text-gray-600">Jarak Tempuh Maksimal: <span id="spec-range"></span> km</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" id="calculate-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-md shadow-md transition duration-300" disabled>
+                            Hitung Biaya
+                        </button>
+                    </div>
+                </form>
+
+                <div id="calculation-results" class="hidden mt-8 p-6 bg-blue-50 rounded-lg">
+                    <h2 class="text-xl font-bold text-center mb-4">Hasil Kalkulasi</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded shadow-sm">
+                            <h3 class="font-bold text-gray-800">Biaya Per Kilometer</h3>
+                            <p id="cost-per-km" class="text-2xl font-bold text-blue-600"></p>
+                        </div>
+                        <div class="bg-white p-4 rounded shadow-sm">
+                            <h3 class="font-bold text-gray-800">Biaya Per 100 Kilometer</h3>
+                            <p id="cost-per-100km" class="text-2xl font-bold text-blue-600"></p>
+                        </div>
+                        <div class="bg-white p-4 rounded shadow-sm">
+                            <h3 class="font-bold text-gray-800">Biaya Pengisian Penuh</h3>
+                            <p id="full-charge-cost" class="text-2xl font-bold text-blue-600"></p>
+                        </div>
+                        <div class="bg-white p-4 rounded shadow-sm">
+                            <h3 class="font-bold text-gray-800">Biaya Harian</h3>
+                            <p id="daily-cost" class="text-2xl font-bold text-blue-600"></p>
+                        </div>
+                        <div class="bg-white p-4 rounded shadow-sm">
+                            <h3 class="font-bold text-gray-800">Biaya Bulanan</h3>
+                            <p id="monthly-cost" class="text-2xl font-bold text-blue-600"></p>
+                        </div>
+                        <div class="bg-white p-4 rounded shadow-sm">
+                            <h3 class="font-bold text-gray-800">Jarak Tempuh Per Pengisian</h3>
+                            <p id="range-per-charge" class="text-2xl font-bold text-blue-600"></p>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            {{-- Model Kendaraan --}}
-            <div class="mb-4">
-                <label class="block text-sm font-bold mb-1">Model Kendaraan</label>
-                <select name="vehicle_id" id="vehicle_id" class="w-full border px-3 py-2" required>
-                    <option value="">-- Pilih Model --</option>
-                    @foreach ($vehicles as $v)
-                        <option value="{{ $v->id }}" data-jenis="{{ $v->category }}" 
-                            {{ old('vehicle_id') == $v->id ? 'selected' : '' }}>
-                            {{ $v->brand->name }} - {{ $v->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            {{-- Harga Listrik --}}
-            <div class="mb-4">
-                <label class="block text-sm font-bold mb-1">Harga Listrik per kWh (Rp)</label>
-                <input type="number" name="harga_listrik" id="harga_listrik" class="w-full border px-3 py-2" 
-                    value="{{ old('harga_listrik', 1444) }}" required min="0">
-            </div>
-
-            {{-- Jarak Tempuh Bulanan --}}
-            <div class="mb-4">
-                <label class="block text-sm font-bold mb-1">Jarak Tempuh per Bulan (km) <span class="text-gray-500 text-sm">(opsional)</span></label>
-                <input type="number" name="jarak" id="jarak" class="w-full border px-3 py-2" 
-                    value="{{ old('jarak', 1000) }}" min="1">
-            </div>
-
-            <button type="submit" class="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-800">Hitung</button>
-        </form>
-
-        {{-- JavaScript Filter Model Kendaraan --}}
-        <script>
-            document.getElementById('jenis_kendaraan').addEventListener('change', function () {
-                const jenis = this.value;
-                const modelSelect = document.getElementById('vehicle_id');
-
-                Array.from(modelSelect.options).forEach(option => {
-                    if (option.value === "") return;
-                    const kategori = option.getAttribute('data-jenis');
-                    option.style.display = kategori === jenis ? 'block' : 'none';
-                });
-
-                modelSelect.value = "";
-            });
-
-            // Trigger filter awal jika data lama masih terisi
-            window.addEventListener('DOMContentLoaded', () => {
-                document.getElementById('jenis_kendaraan').dispatchEvent(new Event('change'));
-            });
-        </script>
-
-        {{-- Hasil Kalkulasi --}}
-        @isset($result)
-        <div class="mt-6 bg-gray-100 p-4 rounded shadow">
-            <h3 class="text-lg font-semibold mb-2">Hasil Kalkulasi</h3>
-            <ul class="space-y-1">
-                <li><strong>Jarak Tempuh:</strong> {{ $result['jarak_bulanan'] }} km</li>
-                <li><strong>Konsumsi Listrik per Km:</strong> {{ $result['kwh_per_km'] }} kWh/km</li>
-                <li><strong>Biaya per Km:</strong> Rp {{ number_format($result['biaya_per_km'], 0, ',', '.') }}</li>
-                <li><strong>Biaya per 100 Km:</strong> Rp {{ number_format($result['biaya_per_100_km'], 0, ',', '.') }}</li>
-                @if ($result['biaya_bulanan'])
-                    <li><strong>Biaya Bulanan:</strong> Rp {{ number_format($result['biaya_bulanan'], 0, ',', '.') }}</li>
-                @endif
-            </ul>
         </div>
-        @endisset
-
-        {{-- Spesifikasi Kendaraan --}}
-        @isset($vehicle)
-        <div class="mt-6 bg-white p-4 rounded shadow">
-            <h3 class="text-lg font-semibold mb-2">Spesifikasi Kendaraan</h3>
-            @php
-                $specs = $vehicle->specs->keyBy('name');
-                $kapasitas = optional($specs->get('Kapasitas'))->pivot->value;
-                $jarakMax = optional($specs->get('Jarak Tempuh'))->pivot->value;
-                $lamaPengisian = optional($specs->get('Lama Pengisian'))->pivot->value;
-                $harga = optional($specs->get('Harga'))->pivot->value;
-                $kwhPerKm = $kapasitas && $jarakMax ? round($kapasitas / $jarakMax, 3) : 0;
-            @endphp
-            <ul class="space-y-1">
-                <li><strong>Kapasitas Baterai:</strong> {{ $kapasitas }} kWh</li>
-                <li><strong>Jarak Tempuh Maksimal:</strong> {{ $jarakMax }} km</li>
-                <li><strong>Konsumsi Listrik per Km:</strong> {{ $kwhPerKm }} kWh/km</li>
-                <li><strong>Lama Pengisian:</strong> {{ $lamaPengisian }}</li>
-                <li><strong>Harga Kendaraan:</strong> Rp {{ number_format($harga, 0, ',', '.') }}</li>
-            </ul>
-        </div>
-        @endisset
     </div>
 
-    <x-slot:footer>
-        <x-menu.footer :logo="$logo" />
-    </x-slot:footer>
+    @push('scripts')
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const vehicleTypeSelect = document.getElementById('vehicle-type');
+    const vehicleBrandSelect = document.getElementById('vehicle-brand');
+    const vehicleModelSelect = document.getElementById('vehicle-model');
+    const dailyDistanceInput = document.getElementById('daily-distance');
+    const electricityPriceInput = document.getElementById('electricity-price');
+    const calculateButton = document.getElementById('calculate-button');
+    const calculatorForm = document.getElementById('calculator-form');
+    const alertError = document.getElementById('alert-error');
+    const errorMessage = document.getElementById('error-message');
+    const vehicleSpecs = document.getElementById('vehicle-specs');
+    const calculationResults = document.getElementById('calculation-results');
+
+    // ketika ganti tipe kendaraan
+    vehicleTypeSelect.addEventListener('change', function() {
+        const typeId = this.value;
+        vehicleBrandSelect.innerHTML = '<option value="">-- Pilih Brand --</option>';
+        vehicleBrandSelect.disabled = !typeId;
+        vehicleModelSelect.innerHTML = '<option value="">-- Pilih Model --</option>';
+        vehicleModelSelect.disabled = true;
+        calculateButton.disabled = true;
+        vehicleSpecs.classList.add('hidden');
+        calculationResults.classList.add('hidden');
+
+        if (!typeId) return;
+
+        // cari type yang dipilih
+        const selectedType = dataTypes.find(type => type.id == typeId);
+        if (!selectedType) return;
+
+        // isi brand berdasarkan type
+        if (selectedType.brands && selectedType.brands.length > 0) {
+            selectedType.brands.forEach(brand => {
+                const option = document.createElement('option');
+                option.value = brand.id;
+                option.textContent = brand.name;
+                vehicleBrandSelect.appendChild(option);
+            });
+        }
+    });
+
+    // ketika ganti brand
+    vehicleBrandSelect.addEventListener('change', function() {
+        const brandId = this.value;
+        vehicleModelSelect.innerHTML = '<option value="">-- Pilih Model --</option>';
+        vehicleModelSelect.disabled = !brandId;
+        calculateButton.disabled = true;
+        vehicleSpecs.classList.add('hidden');
+        calculationResults.classList.add('hidden');
+
+        if (!brandId) return;
+
+        // cari brand di dalam semua types
+        let selectedBrand = null;
+        for (const type of dataTypes) {
+            if (type.brands) {
+                selectedBrand = type.brands.find(b => b.id == brandId);
+                if (selectedBrand) break;
+            }
+        }
+        if (!selectedBrand) return;
+
+        // isi model kendaraan dari brand
+        if (selectedBrand.vehicles && selectedBrand.vehicles.length > 0) {
+            selectedBrand.vehicles.forEach(vehicle => {
+                const option = document.createElement('option');
+                option.value = vehicle.id;
+                option.textContent = vehicle.name;
+                vehicleModelSelect.appendChild(option);
+            });
+        }
+    });
+
+    // ketika ganti model
+    vehicleModelSelect.addEventListener('change', function() {
+        const vehicleId = this.value;
+        calculateButton.disabled = !vehicleId;
+        vehicleSpecs.classList.add('hidden');
+        calculationResults.classList.add('hidden');
+
+        if (!vehicleId) return;
+
+        // cari spesifikasi kendaraan di semua vehicles
+        let selectedVehicle = null;
+        outerLoop:
+        for (const type of dataTypes) {
+            if (type.brands) {
+                for (const brand of type.brands) {
+                    if (brand.vehicles) {
+                        selectedVehicle = brand.vehicles.find(v => v.id == vehicleId);
+                        if (selectedVehicle) break outerLoop;
+                    }
+                }
+            }
+        }
+        if (!selectedVehicle) {
+            showError('Data spesifikasi kendaraan tidak ditemukan.');
+            return;
+        }
+
+        // tampilkan spesifikasi kendaraan
+        document.getElementById('spec-model').textContent = selectedVehicle.name;
+        document.getElementById('spec-brand').textContent = selectedVehicle.brand_name || selectedVehicle.brand?.name || 'N/A';
+        document.getElementById('spec-battery').textContent = selectedVehicle.battery_capacity ?? 'N/A';
+        document.getElementById('spec-consumption').textContent = selectedVehicle.energy_consumption ?? 'N/A';
+        document.getElementById('spec-range').textContent = selectedVehicle.max_range ?? 'N/A';
+        vehicleSpecs.classList.remove('hidden');
+    });
+
+    // submit form kalkulasi tanpa fetch, kalkulasi langsung di frontend
+    calculatorForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        alertError.classList.add('hidden');
+        calculationResults.classList.add('hidden');
+
+        const vehicleId = vehicleModelSelect.value;
+        const dailyDistance = Number(dailyDistanceInput.value);
+        const electricityPrice = Number(electricityPriceInput.value);
+
+        if (!vehicleId || dailyDistance < 0 || electricityPrice < 0) {
+            showError('Mohon lengkapi form dengan benar.');
+            return;
+        }
+
+        // cari kendaraan
+        let vehicle = null;
+        outerLoop:
+        for (const type of dataTypes) {
+            if (type.brands) {
+                for (const brand of type.brands) {
+                    if (brand.vehicles) {
+                        vehicle = brand.vehicles.find(v => v.id == vehicleId);
+                        if (vehicle) break outerLoop;
+                    }
+                }
+            }
+        }
+        if (!vehicle) {
+            showError('Kendaraan tidak ditemukan.');
+            return;
+        }
+
+        // Kalkulasi biaya
+        // Asumsi rumus sederhana (sesuaikan dengan logika kamu)
+        // cost_per_km = (energy_consumption / 100) * electricity_price
+        const consumption = vehicle.energy_consumption ?? 0; // kWh/100km
+        const battery = vehicle.battery_capacity ?? 0; // kWh
+        const maxRange = vehicle.max_range ?? 0; // km
+
+        const costPerKm = (consumption / 100) * electricityPrice;
+        const costPer100km = costPerKm * 100;
+        const fullChargeCost = battery * electricityPrice;
+        const dailyCost = costPerKm * dailyDistance;
+        const monthlyCost = dailyCost * 30;
+        const rangePerCharge = maxRange;
+
+        // tampilkan hasil
+        document.getElementById('cost-per-km').textContent = `Rp ${formatNumber(costPerKm)}`;
+        document.getElementById('cost-per-100km').textContent = `Rp ${formatNumber(costPer100km)}`;
+        document.getElementById('full-charge-cost').textContent = `Rp ${formatNumber(fullChargeCost)}`;
+        document.getElementById('daily-cost').textContent = `Rp ${formatNumber(dailyCost)}`;
+        document.getElementById('monthly-cost').textContent = `Rp ${formatNumber(monthlyCost)}`;
+        document.getElementById('range-per-charge').textContent = `${formatNumber(rangePerCharge)} km`;
+
+        calculationResults.classList.remove('hidden');
+        calculationResults.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    function showError(msg) {
+        alertError.classList.remove('hidden');
+        errorMessage.textContent = msg;
+    }
+
+    function formatNumber(num) {
+        return num.toLocaleString('id-ID', { maximumFractionDigits: 0 });
+    }
+});
+
+    </script>
+    @endpush
+
 </x-layouts.main>

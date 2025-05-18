@@ -14,19 +14,20 @@ use Illuminate\Http\Request;
 class BrandController extends Controller
 {
 
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         $stickies = Blog::with('thumbnail')
-                        ->select('sticky_articles.*', 'blogs.*')
-                        ->join('sticky_articles', 'blogs.id', '=', 'sticky_articles.blog_id')
-                        ->where('blogs.published', true)
-                        ->orderBy('sticky_articles.created_at', 'desc')
-                        ->get();
+            ->select('sticky_articles.*', 'blogs.*')
+            ->join('sticky_articles', 'blogs.id', '=', 'sticky_articles.blog_id')
+            ->where('blogs.published', true)
+            ->orderBy('sticky_articles.created_at', 'desc')
+            ->get();
         $featured = Blog::with('thumbnail')
-                        ->latest()
-                        ->where('published', true)
-                        ->where('featured', true)
-                        ->limit(3)
-                        ->get();
+            ->latest()
+            ->where('published', true)
+            ->where('featured', true)
+            ->limit(3)
+            ->get();
         $newsLimit = 3 - $featured->count();
         if ($newsLimit > 0 && $newsLimit <= 3) {
             $remainderArticles = Blog::with('thumbnail')->latest()->where('published', true)->limit($newsLimit)->get();
@@ -43,7 +44,7 @@ class BrandController extends Controller
 
         // Jika ada filter tipe, ambil brand berdasarkan tipe yang dipilih
         $brandsQuery = Brand::orderBy('name')->withCount('vehicles')->having('vehicles_count', '>', 0);
-        
+
         // Cek apakah ada filter tipe
         if ($request->has('type') && $request->type) {
             // Perbaiki bagian filter dengan menggunakan relasi yang tepat
@@ -62,7 +63,7 @@ class BrandController extends Controller
             'stickies' => $stickies,
             'recentVehicles' => Vehicle::with('brand')->latest()->limit(8)->get(),
             'popularVehicles' => Vehicle::with('brand')
-                ->whereHas('views', fn (Builder $query) => $query->where('created_at', '>', now()->subMonths(3)))
+                ->whereHas('views', fn(Builder $query) => $query->where('created_at', '>', now()->subMonths(3)))
                 ->withCount('views')
                 ->orderBy('views_count', 'desc')
                 ->limit(10)
@@ -80,35 +81,35 @@ class BrandController extends Controller
     //                     ->where('blogs.published', true)
     //                     ->orderBy('sticky_articles.created_at', 'desc')
     //                     ->get();
-    
+
     //     $featured = Blog::with('thumbnail')
     //                     ->latest()
     //                     ->where('published', true)
     //                     ->where('featured', true)
     //                     ->limit(3)
     //                     ->get();
-    
+
     //     $newsLimit = 3 - $featured->count();
     //     if ($newsLimit > 0 && $newsLimit <= 3) {
     //         $remainderArticles = Blog::with('thumbnail')->latest()->where('published', true)->limit($newsLimit)->get();
     //         $stickies = $stickies->concat($featured)->concat($remainderArticles);
     //     }
-    
+
     //     $banner = Option::where([
     //         ['type', 'banner'],
     //         ['name', 'brand']
     //     ])->with('thumbnail')->first();
-    
+
     //     $items = Brand::orderBy('name')
     //                   ->withCount('vehicles')
     //                   ->having('vehicles_count', '>', 0)
     //                   ->get();
-    
+
     //     $recentVehicles = Vehicle::with('brand')
     //                              ->latest()
     //                              ->limit(8)
     //                              ->get();
-    
+
     //     $popularVehicles = Vehicle::with('brand')
     //                               ->whereHas('views', function (Builder $query) {
     //                                   $query->where('created_at', '>', now()->subMonths(3));
@@ -117,11 +118,11 @@ class BrandController extends Controller
     //                               ->orderBy('views_count', 'desc')
     //                               ->limit(10)
     //                               ->get();
-    
+
     //     $logo = Option::where('type', 'logo')
     //                   ->with('thumbnail')
     //                   ->first();
-    
+
     //     return response()->json([
     //         'items' => $items,
     //         'banner' => is_null($banner) || is_null($banner->thumbnail) ? null : $banner->thumbnail,
@@ -131,59 +132,74 @@ class BrandController extends Controller
     //         'logo' => $logo
     //     ]);
     // }
-    
 
-    public function show(Brand $brand) {
+
+    public function show(Brand $brand)
+    {
+        // Artikel sticky + featured + tambahan
         $stickies = Blog::with('thumbnail')
-                        ->select('sticky_articles.*', 'blogs.*')
-                        ->join('sticky_articles', 'blogs.id', '=', 'sticky_articles.blog_id')
-                        ->where('blogs.published', true)
-                        ->orderBy('sticky_articles.created_at', 'desc')
-                        ->get();
+            ->select('sticky_articles.*', 'blogs.*')
+            ->join('sticky_articles', 'blogs.id', '=', 'sticky_articles.blog_id')
+            ->where('blogs.published', true)
+            ->orderBy('sticky_articles.created_at', 'desc')
+            ->get();
+
         $featured = Blog::with('thumbnail')
-                        ->latest()
-                        ->where('published', true)
-                        ->where('featured', true)
-                        ->limit(3)
-                        ->get();
+            ->latest()
+            ->where('published', true)
+            ->where('featured', true)
+            ->limit(3)
+            ->get();
+
         $newsLimit = 3 - $featured->count();
         if ($newsLimit > 0 && $newsLimit <= 3) {
-            $remainderArticles = Blog::with('thumbnail')->latest()->where('published', true)->limit($newsLimit)->get();
+            $remainderArticles = Blog::with('thumbnail')
+                ->latest()
+                ->where('published', true)
+                ->limit($newsLimit)
+                ->get();
             $stickies = $stickies->concat($featured)->concat($remainderArticles);
         }
 
         return view('vehicle.index', [
-            'bikeBrands' => Brand::limit(14)
-                            ->whereHas('vehicles.type', function (Builder $query) {
-                                $query->where('name', 'sepeda motor');
-                            })
-                            ->withCount('vehicles')
-                            ->having('vehicles_count', '>', 0)
-                            ->orderBy('vehicles_count', 'desc')
-                            ->get(),
-            'carBrands' => Brand::limit(14)
-                            ->whereHas('vehicles.type', function (Builder $query) {
-                                $query->where('name', 'mobil');
-                            })
-                            ->withCount('vehicles')
-                            ->having('vehicles_count', '>', 0)
-                            ->orderBy('vehicles_count', 'desc')
-                            ->get(),
-            'vehicles' => Spec::find(1)
-                            ->vehicles()
-                            ->where('brand_id', $brand->id)
-                            ->orderByPivot('value', 'desc')
-                            ->paginate(15),
             'title' => $brand->name,
             'banner' => $brand->thumbnail,
+
+            // Data kendaraan berdasarkan brand dan spesifikasi default (id = 1)
+            'vehicles' => Spec::find(1)
+                ->vehicles()
+                ->where('brand_id', $brand->id)
+                ->orderByPivot('value', 'desc')
+                ->paginate(15),
+
+            // Dropdown filter merek
+            'brands' => Brand::whereHas('vehicles')->get(),
+
+            // Sidebar merek motor dan mobil (top 14)
+            'bikeBrands' => Brand::limit(14)
+                ->whereHas('vehicles.type', fn($q) => $q->where('name', 'sepeda motor'))
+                ->withCount('vehicles')
+                ->having('vehicles_count', '>', 0)
+                ->orderBy('vehicles_count', 'desc')
+                ->get(),
+
+            'carBrands' => Brand::limit(14)
+                ->whereHas('vehicles.type', fn($q) => $q->where('name', 'mobil'))
+                ->withCount('vehicles')
+                ->having('vehicles_count', '>', 0)
+                ->orderBy('vehicles_count', 'desc')
+                ->get(),
+
+            // Sidebar lainnya
             'stickies' => $stickies,
             'recentVehicles' => Vehicle::with('brand')->latest()->limit(8)->get(),
             'popularVehicles' => Vehicle::with('brand')
-                ->whereHas('views', fn (Builder $query) => $query->where('created_at', '>', now()->subMonths(3)))
+                ->whereHas('views', fn($q) => $q->where('created_at', '>', now()->subMonths(3)))
                 ->withCount('views')
-                ->orderBy('views_count', 'desc')
+                ->orderByDesc('views_count')
                 ->limit(10)
                 ->get(),
+
             'logo' => Option::where('type', 'logo')->with('thumbnail')->first()
         ]);
     }
@@ -192,7 +208,7 @@ class BrandController extends Controller
     //     $getImageUrl = function ($image) {
     //         return $image ? asset('storage/' . $image->path) : null;
     //     };
-    
+
     //     // Get stickies with thumbnail
     //     $stickies = Blog::with('thumbnail')
     //                     ->select('sticky_articles.*', 'blogs.*')
@@ -200,7 +216,7 @@ class BrandController extends Controller
     //                     ->where('blogs.published', true)
     //                     ->orderBy('sticky_articles.created_at', 'desc')
     //                     ->get();
-    
+
     //     // Get featured blogs
     //     $featured = Blog::with('thumbnail')
     //                     ->latest()
@@ -208,7 +224,7 @@ class BrandController extends Controller
     //                     ->where('featured', true)
     //                     ->limit(3)
     //                     ->get();
-    
+
     //     // Calculate how many more articles we need to fill the news section
     //     $newsLimit = 3 - $featured->count();
     //     if ($newsLimit > 0 && $newsLimit <= 3) {
@@ -219,7 +235,7 @@ class BrandController extends Controller
     //                                 ->get();
     //         $stickies = $stickies->concat($featured)->concat($remainderArticles);
     //     }
-    
+
     //     // Get bike brands with vehicle count
     //     $bikeBrands = Brand::limit(14)
     //                        ->whereHas('vehicles.type', function (Builder $query) {
@@ -229,7 +245,7 @@ class BrandController extends Controller
     //                        ->having('vehicles_count', '>', 0)
     //                        ->orderBy('vehicles_count', 'desc')
     //                        ->get();
-    
+
     //     // Get car brands with vehicle count
     //     $carBrands = Brand::limit(14)
     //                       ->whereHas('vehicles.type', function (Builder $query) {
@@ -239,7 +255,7 @@ class BrandController extends Controller
     //                       ->having('vehicles_count', '>', 0)
     //                       ->orderBy('vehicles_count', 'desc')
     //                       ->get();
-    
+
     //     // Get vehicles for the specified brand
     //     $vehicles = Spec::find(1)
     //                     ->vehicles()
@@ -247,14 +263,14 @@ class BrandController extends Controller
     //                     ->wherePivot('spec_id', 1) // Filter berdasarkan spec_id
     //                     ->orderByPivot('value', 'desc') // Urutkan berdasarkan value secara descending
     //                     ->paginate(15);
-    
-    
+
+
     //     // Get recent vehicles
     //     $recentVehicles = Vehicle::with('brand')
     //                              ->latest()
     //                              ->limit(8)
     //                              ->get();
-    
+
     //     // Get popular vehicles based on views in the last 3 months
     //     $popularVehicles = Vehicle::with('brand')
     //                               ->whereHas('views', function (Builder $query) {
@@ -264,20 +280,20 @@ class BrandController extends Controller
     //                               ->orderBy('views_count', 'desc')
     //                               ->limit(10)
     //                               ->get();
-    
+
     //     // Get logo with thumbnail
     //     $logo = Option::where('type', 'logo')
     //                   ->with('thumbnail')
     //                   ->first();
-    
+
     //     // Construct banner URL
     //     $bannerUrl = $getImageUrl($brand->thumbnail);
-    
+
     //     // Ensure image URLs for blogs and vehicles
     //     $stickies->each(function($blog) use ($getImageUrl) {
     //         $blog->thumbnail_url = $getImageUrl($blog->thumbnail);
     //     });
-    
+
     //     $featured->each(function($blog) use ($getImageUrl) {
     //         $blog->thumbnail_url = $getImageUrl($blog->thumbnail);
     //     });
@@ -289,14 +305,14 @@ class BrandController extends Controller
     //         $firstPicture = $vehicle->pictures->first();
     //         $vehicle->thumbnail_url = $firstPicture ? $getImageUrl($firstPicture) : null;
     //     });
-        
+
     //     $popularVehicles->each(function($vehicle) use ($getImageUrl) {
     //         $firstPicture = $vehicle->pictures->first();
     //         $vehicle->thumbnail_url = $firstPicture ? $getImageUrl($firstPicture) : null;
     //     });
-        
-       
-    
+
+
+
     //     return response()->json([
     //         'bikeBrands' => $bikeBrands,
     //         'carBrands' => $carBrands,
@@ -309,6 +325,6 @@ class BrandController extends Controller
     //         'logo' => $logo
     //     ]);
     // }
-    
-    
+
+
 }
