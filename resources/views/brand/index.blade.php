@@ -37,21 +37,21 @@
         <x-menu.title-header title="Semua Merek" />
     @endif
 
-{{-- Filter by Vehicle Type --}}
-<div class="mt-4 px-3 md:px-6">
-    <form method="GET" class="w-full max-w-xs">
-        <label for="vehicle_type" class="block mb-1 text-sm font-semibold text-slate-700">Filter berdasarkan Jenis Kendaraan</label>
-        <select name="type" id="vehicle_type" onchange="this.form.submit()" class="w-full border rounded px-3 py-2 shadow-sm focus:outline-none focus:ring focus:ring-purple-200">
-            <option value="">Semua Jenis</option>
-            @foreach ($types as $type)
-                <option value="{{ $type->id }}" {{ request('type') == $type->id ? 'selected' : '' }}>
-                    {{ $type->name }}
-                </option>
-            @endforeach
-        </select>
-    </form>
-</div>
-{{-- End Filter by Vehicle Type --}}
+    {{-- Filter by Vehicle Type --}}
+    <div class="mt-4 px-3 md:px-6">
+        <form method="GET" class="w-full max-w-xs">
+            <label for="vehicle_type" class="block mb-1 text-sm font-semibold text-slate-700">Filter berdasarkan Jenis Kendaraan</label>
+            <select name="type" id="vehicle_type" onchange="this.form.submit()" class="w-full border rounded px-3 py-2 shadow-sm focus:outline-none focus:ring focus:ring-purple-200">
+                <option value="">Semua Jenis</option>
+                @foreach ($types as $type)
+                    <option value="{{ $type->id }}" {{ request('type') == $type->id ? 'selected' : '' }}>
+                        {{ $type->name }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
+    </div>
+    {{-- End Filter by Vehicle Type --}}
 
 
     {{-- Brand Container --}}

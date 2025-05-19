@@ -69,7 +69,7 @@ public function index(Request $request)
     }
 
     public function store(Request $request) {
-        dd($request->all());
+        // dd($request->all());
         $typeId = $request->type;
         $brandId = $request->brand;
 
