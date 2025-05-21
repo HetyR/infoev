@@ -82,7 +82,7 @@
             if (!vehicle1 && !vehicle2) return;
             if (vehicle1 && vehicle2 && vehicle1 === vehicle2) return;
 
-            fetch('{{ route('compare.fetch', [], true) }}', {
+            fetch('https://infoev.mazkama.web.id/compare/fetch', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
