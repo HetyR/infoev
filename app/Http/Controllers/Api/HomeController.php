@@ -117,7 +117,8 @@ class HomeController extends Controller
         };
 
         $searchVehicleIds = Vehicle::search($request->q)->get()->pluck('id');
-        $vehicles = Spec::find(1)
+        // $vehicles = Spec::find(1)
+        $vehicles = Spec::first()
                         ->vehicles()
                         ->wherePivotIn('vehicle_id', $searchVehicleIds)
                         ->orderByPivot('value', 'desc')

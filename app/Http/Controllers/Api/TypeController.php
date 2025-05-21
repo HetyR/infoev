@@ -13,6 +13,7 @@ use App\Models\Vehicle;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 class TypeController extends Controller
 {
+    //Update untuk testing
     public function index() {
         // Ambil data banner jika diperlukan
         $banner = Option::where([
@@ -92,7 +93,8 @@ class TypeController extends Controller
             return $image ? asset('storage/' . $image->path) : null;
         };
 
-        $vehicles = Spec::find(1)
+        // $vehicles = Spec::find(1)
+        $vehicles = Spec::first()
                         ->vehicles()
                         ->where('type_id', $type->id)
                         ->orderByPivot('value', 'desc')

@@ -18,7 +18,7 @@ class BrandController extends Controller
         // Update Untuk Testing
         $items = Brand::orderBy('name')
                       ->withCount('vehicles')
-                    //   ->having('vehicles_count', '>', 0)
+                      ->having('vehicles_count', '>', 0)
                       ->get();
     
        
@@ -92,7 +92,8 @@ class BrandController extends Controller
         };
     
         // Get vehicles for the specified brand
-        $vehicles = Spec::find(1)
+        // $vehicles = Spec::find(1)
+        $vehicles = Spec::first()
                         ->vehicles()
                         ->where('brand_id', $brand->id)
                         ->wherePivot('spec_id', 1) // Filter berdasarkan spec_id

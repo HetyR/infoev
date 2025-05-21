@@ -88,6 +88,7 @@ class KeranjangController extends Controller
             return redirect()->route('login');
         }
     }
+    
     public function remove($vehicleId)
     {
         $user = auth()->user();

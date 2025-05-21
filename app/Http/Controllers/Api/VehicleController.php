@@ -12,38 +12,39 @@ use App\Models\Spec;
 use App\Models\SpecCategory;
 use App\Models\Vehicle;
 use App\Models\SpecVehicle;
-use App\Models\VehicleView;  
-use App\Models\Type; 
+use App\Models\VehicleView;
+use App\Models\Type;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 
-
 class VehicleController extends Controller
 {
-
-    public function show(Vehicle $vehicle, Request $request) {
+    public function show(Vehicle $vehicle, Request $request)
+    {
         if ($vehicle->name == 'all') {
             return response()->json(['error' => 'Resource not found'], 404);
         }
-    
-        $specCategories = SpecCategory::with(['specs',
+
+        $specCategories = SpecCategory::with([
+            'specs',
             'specs.vehicles' => function ($query) use ($vehicle) {
                 $query->where('vehicles.id', $vehicle->id);
-            }])
+            },
+        ])
             ->whereRelation('specs.vehicles', 'vehicles.id', $vehicle->id)
             ->orderBy('priority')
             ->get();
-    
+
         $highlightSpecIds = Spec::whereIn('name', ['kapasitas', 'pengisian daya ac', 'kecepatan maksimal', 'jarak tempuh'])
             ->get()
             ->pluck('id');
-    
+
         $specs = Vehicle::find($vehicle->id)->specs()->wherePivotIn('spec_id', $highlightSpecIds)->get();
         $highlightSpecs = [];
-    
+
         foreach ($specs as $spec) {
             $push = [];
             switch ($spec->name) {
@@ -71,18 +72,18 @@ class VehicleController extends Controller
                 default:
                     break;
             }
-    
+
             array_push($highlightSpecs, $push);
         }
-    
+
         // Prepare affiliate links data
-        $affiliateLinks = $vehicle->affiliateLinks->map(function($affiliate) {
+        $affiliateLinks = $vehicle->affiliateLinks->map(function ($affiliate) {
             return [
                 'link' => $affiliate->link,
                 'marketplace_logo' => asset('storage/' . $affiliate->marketplace->logo->path),
             ];
         });
-    
+
         return response()->json([
             'specCategories' => $specCategories,
             'highlightSpecs' => $highlightSpecs,
@@ -116,7 +117,7 @@ class VehicleController extends Controller
     //     $vehicle->name = $request->name;
     //     $vehicle->type()->associate($type);
     //     $vehicle->brand()->associate($brand);
-    //     $vehicle->save(); 
+    //     $vehicle->save();
 
     //     // Process specs
     //     $specIds = $request->spec_ids ?? [];
@@ -164,7 +165,6 @@ class VehicleController extends Controller
     //         }
     //     }
 
-
     //     $vehicle->specs()->attach($pivot);
 
     //     if (!empty($pivotLists)) {
@@ -189,7 +189,6 @@ class VehicleController extends Controller
     //             }
     //         }
     //     }
-
 
     //     // Upload pictures
     //     if ($request->hasFile('pictures')) {
@@ -368,6 +367,8 @@ class VehicleController extends Controller
             'pictures.*' => 'file|image|max:2048',
         ]);
 
+        $valueBools = $request->input('value_bool', []);
+
         if ($validator->fails()) {
             Log::warning('Validation failed for vehicle store', ['errors' => $validator->errors()]);
             return response()->json(['errors' => $validator->errors()], 422);
@@ -377,7 +378,7 @@ class VehicleController extends Controller
             $type = Type::find($request->type);
             $brand = Brand::find($request->brand);
 
-            $vehicle = new Vehicle;
+            $vehicle = new Vehicle();
             $vehicle->name = $request->name;
             $vehicle->type()->associate($type);
             $vehicle->brand()->associate($brand);
@@ -394,13 +395,56 @@ class VehicleController extends Controller
             $pivot = [];
             $pivotLists = [];
 
+            // for ($i = 0; $i < count($specIds); $i++) {
+            //     $specId = $specIds[$i];
+            //     $specType = $specTypes[$i] ?? null;
+            //     $specValue = $specValues[$i] ?? null;
+            //     $specDesc = $specDescriptions[$i] ?? null;
+
+            //     if ($specValue === null && $specDesc === null) {
+            //         continue;
+            //     }
+
+            //     if (!$specId || !$specType) {
+            //         continue;
+            //     }
+
+            //     $pivot[$specId] = [
+            //         'value' => null,
+            //         'value_desc' => null,
+            //         'value_bool' => null
+            //     ];
+
+            //     switch ($specType) {
+            //         case 'availability':
+            //             $pivot[$specId]['value_bool'] = filter_var($specValue, FILTER_VALIDATE_BOOLEAN);
+            //             $pivot[$specId]['value_desc'] = $specDesc;
+            //             break;
+
+            //         case 'list':
+            //             $listKey = "list_values_{$specId}";
+            //             $lists = $request->input($listKey, []);
+            //             $pivot[$specId]['value_desc'] = $specDesc;
+            //             $pivotLists[] = [
+            //                 'specId' => $specId,
+            //                 'lists' => $lists
+            //             ];
+            //             break;
+
+            //         default:
+            //             $pivot[$specId]['value'] = $specValue;
+            //             $pivot[$specId]['value_desc'] = $specDesc;
+            //             break;
+            //     }
+            // }
+
             for ($i = 0; $i < count($specIds); $i++) {
                 $specId = $specIds[$i];
                 $specType = $specTypes[$i] ?? null;
                 $specValue = $specValues[$i] ?? null;
                 $specDesc = $specDescriptions[$i] ?? null;
 
-                if ($specValue === null && $specDesc === null) {
+                if ($specValue === null && $specDesc === null && !isset($valueBools[$specId])) {
                     continue;
                 }
 
@@ -411,12 +455,14 @@ class VehicleController extends Controller
                 $pivot[$specId] = [
                     'value' => null,
                     'value_desc' => null,
-                    'value_bool' => null
+                    'value_bool' => null,
                 ];
 
                 switch ($specType) {
                     case 'availability':
-                        $pivot[$specId]['value_bool'] = filter_var($specValue, FILTER_VALIDATE_BOOLEAN);
+                        // Gunakan value_bool jika ada
+                        $boolValue = $valueBools[$specId] ?? $specValue;
+                        $pivot[$specId]['value_bool'] = filter_var($boolValue, FILTER_VALIDATE_BOOLEAN);
                         $pivot[$specId]['value_desc'] = $specDesc;
                         break;
 
@@ -426,7 +472,7 @@ class VehicleController extends Controller
                         $pivot[$specId]['value_desc'] = $specDesc;
                         $pivotLists[] = [
                             'specId' => $specId,
-                            'lists' => $lists
+                            'lists' => $lists,
                         ];
                         break;
 
@@ -471,30 +517,30 @@ class VehicleController extends Controller
 
                     $vehicle->pictures()->create([
                         'path' => $path,
-                        'thumbnail' => true
+                        'thumbnail' => true,
                     ]);
 
                     Log::info('Single picture uploaded', [
                         'vehicle_id' => $vehicle->id,
-                        'path' => $path
+                        'path' => $path,
                     ]);
                 }
             }
 
-
-            return response()->json([
-                'message' => 'Vehicle created successfully',
-                'vehicle' => $vehicle->load('type', 'brand', 'specs.lists', 'pictures')
-            ], 201);
-
+            return response()->json(
+                [
+                    'message' => 'Vehicle created successfully',
+                    'vehicle' => $vehicle->load('type', 'brand', 'specs.lists', 'pictures'),
+                ],
+                201,
+            );
         } catch (\Exception $e) {
             Log::error('Error storing vehicle', [
                 'error_message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json(['error' => 'Failed to create vehicle.'], 500);
         }
     }
-
-}    
+}

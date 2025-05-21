@@ -16,6 +16,15 @@ use App\Http\Controllers\Api\ChargerStationController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Api\SpecTestController;
 
+use App\Http\Controllers\Api\KeranjangController;
+
+
+
+//Update Route Keranjang Loved Vehicle
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/keranjang', [KeranjangController::class, 'index']);
+    Route::delete('/keranjang/{vehicleId}', [KeranjangController::class, 'remove']);
+});
 
 // Route Testing
 Route::prefix('v2')->group(function () {
