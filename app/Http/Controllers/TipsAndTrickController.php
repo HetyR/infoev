@@ -71,46 +71,46 @@ class TipsAndTrickController extends Controller
         ]);
     }
 
-    public function show($id)
-    {
-        $tipsAndTrick = TipsAndTrick::findOrFail($id);
+    // public function show($id)
+    // {
+    //     $tipsAndTrick = TipsAndTrick::findOrFail($id);
 
-        $stickies = TipsAndTrick::where('published', true)
-            ->where('is_sticky', true)->latest()->get();
+    //     $stickies = TipsAndTrick::where('published', true)
+    //         ->where('is_sticky', true)->latest()->get();
 
-        $featured = TipsAndTrick::where('published', true)
-            ->where('featured', true)->latest()->limit(3)->get();
+    //     $featured = TipsAndTrick::where('published', true)
+    //         ->where('featured', true)->latest()->limit(3)->get();
 
-        $newsLimit = 3 - $featured->count();
-        if ($newsLimit > 0 && $newsLimit <= 3) {
-            $remainder = TipsAndTrick::where('published', true)
-                ->latest()->limit($newsLimit)->get();
+    //     $newsLimit = 3 - $featured->count();
+    //     if ($newsLimit > 0 && $newsLimit <= 3) {
+    //         $remainder = TipsAndTrick::where('published', true)
+    //             ->latest()->limit($newsLimit)->get();
 
-            $stickies = $stickies->concat($featured)->concat($remainder);
-        }
+    //         $stickies = $stickies->concat($featured)->concat($remainder);
+    //     }
 
-        return view('tips.show', [
-            'bikeBrands' => Brand::limit(14)
-                ->whereHas('vehicles.type', fn (Builder $q) =>
-                    $q->where('name', 'sepeda motor'))
-                ->withCount('vehicles')->having('vehicles_count', '>', 0)
-                ->orderBy('vehicles_count', 'desc')->get(),
+    //     return view('tips.show', [
+    //         'bikeBrands' => Brand::limit(14)
+    //             ->whereHas('vehicles.type', fn (Builder $q) =>
+    //                 $q->where('name', 'sepeda motor'))
+    //             ->withCount('vehicles')->having('vehicles_count', '>', 0)
+    //             ->orderBy('vehicles_count', 'desc')->get(),
 
-            'carBrands' => Brand::limit(14)
-                ->whereHas('vehicles.type', fn (Builder $q) =>
-                    $q->where('name', 'mobil'))
-                ->withCount('vehicles')->having('vehicles_count', '>', 0)
-                ->orderBy('vehicles_count', 'desc')->get(),
+    //         'carBrands' => Brand::limit(14)
+    //             ->whereHas('vehicles.type', fn (Builder $q) =>
+    //                 $q->where('name', 'mobil'))
+    //             ->withCount('vehicles')->having('vehicles_count', '>', 0)
+    //             ->orderBy('vehicles_count', 'desc')->get(),
 
-            'tipsAndTrick' => $tipsAndTrick,
-            'stickies' => $stickies,
-            'recentVehicles' => Vehicle::with('brand')->latest()->limit(8)->get(),
-            'popularVehicles' => Vehicle::with('brand')
-                ->whereHas('views', fn (Builder $q) =>
-                    $q->where('created_at', '>', now()->subMonths(3)))
-                ->withCount('views')->orderBy('views_count', 'desc')->limit(10)->get(),
-            'logo' => Option::where('type', 'logo')->with('thumbnail')->first()
-        ]);
-    }
+    //         'tipsAndTrick' => $tipsAndTrick,
+    //         'stickies' => $stickies,
+    //         'recentVehicles' => Vehicle::with('brand')->latest()->limit(8)->get(),
+    //         'popularVehicles' => Vehicle::with('brand')
+    //             ->whereHas('views', fn (Builder $q) =>
+    //                 $q->where('created_at', '>', now()->subMonths(3)))
+    //             ->withCount('views')->orderBy('views_count', 'desc')->limit(10)->get(),
+    //         'logo' => Option::where('type', 'logo')->with('thumbnail')->first()
+    //     ]);
+    // }
     
 }
