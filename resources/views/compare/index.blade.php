@@ -82,7 +82,7 @@
             if (!vehicle1 && !vehicle2) return;
             if (vehicle1 && vehicle2 && vehicle1 === vehicle2) return;
 
-            fetch('{{ route('compare.fetch') }}', {
+            fetch('{{ route('compare.fetch', [], true) }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -134,7 +134,7 @@
             <h3 class="font-bold mb-1">${vehicle.brand.name} ${vehicle.name}</h3>`;
                 if (thumb) {
                     html +=
-                    `<img src="/storage/${thumb}" class="mx-auto max-w-[150px] rounded shadow">`;
+                        `<img src="/storage/${thumb}" class="mx-auto max-w-[150px] rounded shadow">`;
                 }
                 html += '</div>';
             });
@@ -214,9 +214,9 @@
 
                         case 'availability':
                             val1 = veh1?.pivot?.value_bool === 1 ? 'Tersedia' :
-                            'Tidak tersedia';
+                                'Tidak tersedia';
                             val2 = veh2?.pivot?.value_bool === 1 ? 'Tersedia' :
-                            'Tidak tersedia';
+                                'Tidak tersedia';
                             break;
 
                         default:
