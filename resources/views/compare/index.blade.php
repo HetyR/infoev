@@ -82,7 +82,7 @@
             if (!vehicle1 && !vehicle2) return;
             if (vehicle1 && vehicle2 && vehicle1 === vehicle2) return;
 
-            fetch('https://infoev.mazkama.web.id/compare/fetch', {
+            fetch("{{ request()->secure() ? secure_url('/compare/fetch') : url('/compare/fetch') }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
