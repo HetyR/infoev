@@ -213,6 +213,8 @@ Route::middleware('auth')->group(function () {
 Route::get('/compare', [CompareController::class, 'index'])->name('compare.index');
 Route::post('/compare/add', [CompareController::class, 'addToCompare'])->name('compare.add');
 Route::post('/compare', [CompareController::class, 'index'])->name('compare.result');
+Route::post('/compare/fetch', [CompareController::class, 'fetchComparison'])->name('compare.fetch');
+
 
 // Finder
 Route::get('/finder', [FinderController::class, 'index'])->name('finder.index');
