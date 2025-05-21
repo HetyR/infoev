@@ -13,10 +13,20 @@
                         {{-- Glide controls --}}
                         <div class="text-white" data-glide-el="controls">
                             <button class="absolute left-2 top-1/2 -translate-y-1/2 z-50" data-glide-dir="<">
-                                <svg viewBox="0 0 20 20" fill="currentColor" class="chevron-left w-6 h-6 md:w-10 md:h-10"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                <svg viewBox="0 0 20 20" fill="currentColor"
+                                    class="chevron-left w-6 h-6 md:w-10 md:h-10">
+                                    <path fill-rule="evenodd"
+                                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
                             </button>
                             <button class="absolute right-2 top-1/2 -translate-y-1/2 z-50" data-glide-dir=">">
-                                <svg viewBox="0 0 20 20" fill="currentColor" class="chevron-right w-6 h-6 md:w-10 md:h-10"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                                <svg viewBox="0 0 20 20" fill="currentColor"
+                                    class="chevron-right w-6 h-6 md:w-10 md:h-10">
+                                    <path fill-rule="evenodd"
+                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
                             </button>
                         </div>
                         {{-- Glide track --}}
@@ -25,11 +35,13 @@
                                 @foreach ($img as $pic)
                                     @if (Storage::exists('public/' . $pic->path))
                                         <li class="glide__slide h-full">
-                                            <img src="{{ asset('storage/' . $pic->path) }}" class="w-full h-full object-cover" alt="{{ $title }}">
+                                            <img src="{{ asset('storage/' . $pic->path) }}"
+                                                class="w-full h-full object-cover" alt="{{ $title }}">
                                         </li>
                                     @else
                                         <li class="glide__slide h-full">
-                                            <img src="{{ asset('img/placeholder-lg.png') }}" class="w-full h-full object-cover" alt="{{ $title }}">
+                                            <img src="{{ asset('img/placeholder-lg.png') }}"
+                                                class="w-full h-full object-cover" alt="{{ $title }}">
                                         </li>
                                     @endif
                                 @endforeach
@@ -38,34 +50,39 @@
                     </div>
                 @else
                     @if (Storage::exists('public/' . $img[0]->path))
-                        <img src="{{ asset('storage/' . $img[0]->path) }}" class="w-full h-full object-cover" alt="{{ $title }}">
+                        <img src="{{ asset('storage/' . $img[0]->path) }}" class="w-full h-full object-cover"
+                            alt="{{ $title }}">
                     @else
-                        <img src="{{ asset('img/placeholder-lg.png') }}" class="w-full h-full object-cover" alt="{{ $title }}">
+                        <img src="{{ asset('img/placeholder-lg.png') }}" class="w-full h-full object-cover"
+                            alt="{{ $title }}">
                     @endif
                 @endif
             @else
-                <img src="{{ asset('img/placeholder-lg.png') }}" class="w-full h-full object-cover" alt="{{ $title }}">
+                <img src="{{ asset('img/placeholder-lg.png') }}" class="w-full h-full object-cover"
+                    alt="{{ $title }}">
             @endif
         </div>
 
-        {{-- Title dan tombol Compare sejajar di pojok bawah --}}
-        <div class="hidden w-full mt-auto px-10 py-6 backdrop-contrast-50 bg-black/40 md:flex items-center justify-between z-10 relative">
+{{-- title & compare --}}
+        <div
+            class="hidden w-full mt-auto px-10 py-6 backdrop-contrast-50 bg-black/40 md:flex items-center justify-between z-10 relative">
             <h2 class="text-white text-3xl font-semibold">{{ $title }}</h2>
-<form action="{{ route('compare.add') }}" method="POST" class="m-0 p-0">
-    @csrf
-    <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
-    <button type="submit"
-        class="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold text-sm px-4 py-2 rounded border border-transparent
+            <form action="{{ route('compare.add') }}" method="POST" class="m-0 p-0">
+                @csrf
+                <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
+                <button type="submit"
+                    class="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold text-sm px-4 py-2 rounded border border-transparent
                cursor-pointer
                transition-colors duration-300 ease-in-out
                hover:bg-purple-900 hover:border-purple-900 hover:text-white
                focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
-        COMPARE
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-4 h-4">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
-    </button>
-</form>
+                    COMPARE
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </form>
 
 
         </div>
