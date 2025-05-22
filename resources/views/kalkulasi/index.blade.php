@@ -42,10 +42,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             
             <!-- Calculator Section - 2 Kolom -->
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                 
-                <!-- Form Section - 2 kolom dari 5 -->
-                <div class="lg:col-span-2">
+                <!-- Form Section -->
+                <div>
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <!-- Header dengan gradient -->
                         <div class="px-6 py-5 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
@@ -145,8 +145,8 @@
                     </div>
                 </div>
 
-                <!-- Results Section - 3 kolom dari 5 -->
-                <div class="lg:col-span-3">
+                <!-- Results Section -->
+                <div>
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-fit">
                         <!-- Header dengan gradient -->
                         <div class="px-6 py-5 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
