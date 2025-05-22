@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\Log;
 
 class KalkulasiController extends Controller
 {
-    /**
-     * Display the EV calculator page
-     */
+     // Konstanta untuk biaya maintenance per km
+    const BIAYA_MAINTENANCE_PER_KM = 100; // Rp
+    
 public function index()
 {
     $types = Type::select('id', 'name', 'slug')->get();
@@ -47,7 +47,7 @@ public function index()
         $stickies = $stickies->concat($featured)->concat($extra);
     }
 
-    return view('vehicle.kalkulasi.index', [
+    return view('kalkulasi.index', [
         'types' => $types,
         'vehicles' => $vehicles,
         'logo' => $logo?->thumbnail,
@@ -61,150 +61,190 @@ public function index()
 }
 
 
-    /**
-     * Get brands based on vehicle type
-     */
-    public function getBrandsByType(Request $request)
+ public function hitungBiaya(Request $request, $vehicleId)
     {
-        $typeId = $request->type_id;
-        
-        $brands = Brand::whereHas('vehicles', function ($query) use ($typeId) {
-            $query->where('type_id', $typeId);
-        })->select('id', 'name', 'slug')->get();
-
-        return response()->json(['brands' => $brands]);
-    }
-
-    /**
-     * Get vehicles based on brand
-     */
-    public function getVehiclesByBrand(Request $request)
-    {
-        $brandId = $request->brand_id;
-        
-        $vehicles = Vehicle::where('brand_id', $brandId)
-            ->select('id', 'name', 'slug')
-            ->get();
-
-        return response()->json(['vehicles' => $vehicles]);
-    }
-
-    /**
-     * Get vehicle specifications for EV calculation
-     */
-    public function getVehicleSpecs(Request $request)
-    {
-        $vehicleId = $request->vehicle_id;
-        
-        try {
-            $vehicle = Vehicle::with(['brand', 'specs'])->findOrFail($vehicleId);
-            
-            // Mencari spec yang terkait dengan perhitungan EV
-            $batteryCapacity = $this->findSpecValue($vehicle, ['kapasitas', 'Kapasitas', 'Battery Capacity']);
-            $energyConsumption = $this->findSpecValue($vehicle, ['konsumsi energi', 'Konsumsi Energi', 'Energy Consumption']);
-            $maxRange = $this->findSpecValue($vehicle, ['jarak tempuh', 'Jarak Tempuh', 'Max Range']);
-            $chargingPower = $this->findSpecValue($vehicle, ['pengisian daya', 'Pengisian Daya', 'Charging Power']);
-
-            // Extract the relevant specs into a more user-friendly format
-            $evSpecs = [
-                'id' => $vehicle->id,
-                'name' => $vehicle->name,
-                'brand' => $vehicle->brand->name,
-                'battery_capacity' => $batteryCapacity ? floatval($batteryCapacity) : null, // kWh
-                'energy_consumption' => $energyConsumption ? floatval($energyConsumption) : null, // kWh/100km
-                'max_range' => $maxRange ? floatval($maxRange) : null, // km
-                'charging_power' => $chargingPower ? floatval($chargingPower) : null // kW
-            ];
-
-            return response()->json(['success' => true, 'vehicle_specs' => $evSpecs]);
-        } catch (\Exception $e) {
-            Log::error('Error getting vehicle specs: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Gagal mendapatkan spesifikasi kendaraan']);
-        }
-    }
-
-    /**
-     * Helper function to find spec value by various possible names
-     */
-    private function findSpecValue($vehicle, $possibleNames)
-    {
-        foreach ($vehicle->specs as $spec) {
-            if (in_array(strtolower($spec->name), array_map('strtolower', $possibleNames))) {
-                return $spec->pivot->value;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Calculate EV costs based on specs and user inputs
-     */
-    public function calculateCosts(Request $request)
-    {
-        // Validate request
+        // Validasi input
         $request->validate([
-            'vehicle_id' => 'required|exists:vehicles,id',
-            'daily_distance' => 'required|numeric|min:0',
-            'electricity_price' => 'required|numeric|min:0'
+            'rata_rata_berkendara' => 'nullable|numeric|min:0',
+            'harga_listrik' => 'nullable|numeric|min:0'
         ]);
-
-        try {
-            // Get vehicle data
-            $vehicle = Vehicle::with(['specs'])->findOrFail($request->vehicle_id);
-            
-            // Extract specs
-            $batteryCapacity = $this->findSpecValue($vehicle, ['kapasitas', 'Kapasitas', 'Battery Capacity']);
-            $energyConsumption = $this->findSpecValue($vehicle, ['konsumsi energi', 'Konsumsi Energi', 'Energy Consumption']);
-            $maxRange = $this->findSpecValue($vehicle, ['jarak tempuh', 'Jarak Tempuh', 'Max Range']);
-
-            // Konversi nilai ke float
-            $batteryCapacity = $batteryCapacity ? floatval($batteryCapacity) : null;
-            $energyConsumption = $energyConsumption ? floatval($energyConsumption) : null;
-            $maxRange = $maxRange ? floatval($maxRange) : null;
-
-            // If specs are not available, use calculated values
-            if (!$energyConsumption && $batteryCapacity && $maxRange) {
-                $energyConsumption = ($batteryCapacity / $maxRange) * 100;
-            }
-
-            // If still don't have required specs, return error
-            if (!$batteryCapacity || !$energyConsumption) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Data spesifikasi kendaraan tidak lengkap untuk kalkulasi'
-                ]);
-            }
-
-            // Get user inputs
-            $dailyDistance = floatval($request->daily_distance);
-            $electricityPrice = floatval($request->electricity_price); // Rp/kWh
-
-            // Calculate costs
-            $costPerKm = ($energyConsumption / 100) * $electricityPrice;
-            $costPer100Km = $energyConsumption * $electricityPrice;
-            $fullChargeCost = $batteryCapacity * $electricityPrice;
-            $dailyCost = $costPerKm * $dailyDistance;
-            $monthlyCost = $dailyCost * 30;
-            $rangePerCharge = $maxRange ?: ($batteryCapacity / ($energyConsumption / 100));
-
-            // Return calculated results
+        
+        // Default values
+        $rataRataBerkendara = $request->input('rata_rata_berkendara', 30); // km per hari
+        $hargaListrik = $request->input('harga_listrik', 1445); // Rp per kWh
+        
+        // Cari kendaraan dari database
+        $vehicle = Vehicle::find($vehicleId);
+        
+        if (!$vehicle || $vehicle->name == 'all') {
             return response()->json([
-                'success' => true,
-                'results' => [
-                    'cost_per_km' => round($costPerKm, 2),
-                    'cost_per_100km' => round($costPer100Km, 2),
-                    'full_charge_cost' => round($fullChargeCost, 2),
-                    'daily_cost' => round($dailyCost, 2),
-                    'monthly_cost' => round($monthlyCost, 2),
-                    'range_per_charge' => round($rangePerCharge, 2)
-                ]
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error calculating EV costs: ' . $e->getMessage());
-            return response()->json([
-                'success' => false, 
-                'message' => 'Terjadi kesalahan saat kalkulasi'
-            ]);
+                'success' => false,
+                'message' => 'Kendaraan tidak ditemukan'
+            ], 404);
         }
+        
+        // Ambil data kapasitas baterai dan jarak tempuh dari database
+        $kapasitasBaterai = $this->getVehicleSpec($vehicle, 'kapasitas');
+        $jarakTempuh = $this->getVehicleSpec($vehicle, 'jarak tempuh');
+        
+        if (!$kapasitasBaterai || !$jarakTempuh) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data spesifikasi kendaraan tidak lengkap'
+            ], 404);
+        }
+        
+        // Hitung konsumsi energi (kWh/km)
+        $konsumsiEnergi = $kapasitasBaterai / $jarakTempuh;
+        
+        // Biaya per Kilometer = Konsumsi Energi * Harga Listrik per kWh
+        $biayaPerKilometer = $konsumsiEnergi * $hargaListrik;
+        
+        // Biaya per 100 Kilometer = Biaya per Kilometer * 100
+        $biayaPer100Kilometer = $biayaPerKilometer * 100;
+        
+        // Biaya Pengisian Penuh = Kapasitas Baterai * Harga Listrik per kWh
+        $biayaPengisianPenuh = $kapasitasBaterai * $hargaListrik;
+        
+        // Biaya Harian = (Biaya per Kilometer + Biaya Maintenance per km) * Rata-rata Berkendara per Hari(KM)
+        $biayaHarian = ($biayaPerKilometer + self::BIAYA_MAINTENANCE_PER_KM) * $rataRataBerkendara;
+        
+        // Biaya Bulanan(estimasi) = Biaya Harian * 30
+        $biayaBulanan = $biayaHarian * 30;
+        
+        // Jarak Tempuh per Pengisian = Jarak Tempuh
+        $jarakTempuhPerPengisian = $jarakTempuh;
+        
+        // Format data tambahan untuk response
+        $kendaraanData = $this->getVehicleHighlightSpecs($vehicle);
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'kendaraan' => [
+                    'id' => $vehicle->id,
+                    'nama' => $vehicle->name,
+                    'kapasitas_baterai' => $kapasitasBaterai,
+                    'jarak_tempuh' => $jarakTempuh,
+                    'highlight_specs' => $kendaraanData
+                ],
+                'input' => [
+                    'rata_rata_berkendara' => $rataRataBerkendara,
+                    'harga_listrik' => $hargaListrik,
+                    'biaya_maintenance' => self::BIAYA_MAINTENANCE_PER_KM
+                ],
+                'hasil' => [
+                    'konsumsi_energi' => round($konsumsiEnergi, 4),
+                    'biaya_per_kilometer' => round($biayaPerKilometer, 2),
+                    'biaya_per_100_kilometer' => round($biayaPer100Kilometer, 2),
+                    'biaya_pengisian_penuh' => round($biayaPengisianPenuh, 2),
+                    'biaya_harian' => round($biayaHarian, 2),
+                    'biaya_bulanan' => round($biayaBulanan, 2),
+                    'jarak_tempuh_per_pengisian' => $jarakTempuhPerPengisian
+                ]
+            ]
+        ]);
+    }
+    
+    /**
+     * Mengambil nilai spesifikasi kendaraan tertentu
+     * 
+     * @param Vehicle $vehicle
+     * @param string $specName
+     * @return float|null
+     */
+    private function getVehicleSpec(Vehicle $vehicle, $specName)
+    {
+        $spec = Spec::where('name', $specName)->first();
+        
+        if (!$spec) {
+            return null;
+        }
+        
+        $vehicleSpec = $vehicle->specs()->where('specs.id', $spec->id)->first();
+        
+        if (!$vehicleSpec) {
+            return null;
+        }
+        
+        return (float) $vehicleSpec->pivot->value;
+    }
+    
+    /**
+     * Mengambil spesifikasi highlight kendaraan
+     * 
+     * @param Vehicle $vehicle
+     * @return array
+     */
+    private function getVehicleHighlightSpecs(Vehicle $vehicle)
+    {
+        $highlightSpecIds = Spec::where('name', 'kapasitas')
+            ->orWhere('name', 'pengisian daya ac')
+            ->orWhere('name', 'kecepatan maksimal')
+            ->orWhere('name', 'jarak tempuh')
+            ->get()
+            ->pluck('id');
+            
+        $specs = $vehicle->specs()->wherePivotIn('spec_id', $highlightSpecIds)->get();
+        $highlightSpecs = [];
+
+        foreach ($specs as $spec) {
+            $push = [];
+            switch (strtolower($spec->name)) {
+                case 'kapasitas':
+                    $push['type'] = 'capacity';
+                    $push['value'] = (float) $spec->pivot->value;
+                    $push['unit'] = $spec->unit;
+                    break;
+                case 'pengisian daya ac':
+                    $push['type'] = 'charge';
+                    $push['value'] = (float) $spec->pivot->value;
+                    $push['unit'] = $spec->unit;
+                    $push['desc'] = $spec->pivot->value_desc;
+                    break;
+                case 'kecepatan maksimal':
+                    $push['type'] = 'maxSpeed';
+                    $push['value'] = (float) $spec->pivot->value;
+                    $push['unit'] = $spec->unit;
+                    break;
+                case 'jarak tempuh':
+                    $push['type'] = 'range';
+                    $push['value'] = (float) $spec->pivot->value;
+                    $push['unit'] = $spec->unit;
+                    break;
+                default:
+                    break;
+            }
+
+            if (!empty($push)) {
+                array_push($highlightSpecs, $push);
+            }
+        }
+        
+        return $highlightSpecs;
+    }
+    
+    /**
+     * Menampilkan form kalkulasi (opsional)
+     * 
+     * @param int $vehicleId
+     * @return \Illuminate\View\View
+     */
+    public function showKalkulasi($vehicleId)
+    {
+        $vehicle = Vehicle::findOrFail($vehicleId);
+        
+        if ($vehicle->name == 'all') abort(404);
+        
+        // Dapatkan informasi spesifikasi kendaraan
+        $kapasitasBaterai = $this->getVehicleSpec($vehicle, 'kapasitas');
+        $jarakTempuh = $this->getVehicleSpec($vehicle, 'jarak tempuh');
+        
+        return view('kalkulasi.index', [
+            'vehicle' => $vehicle,
+            'kapasitasBaterai' => $kapasitasBaterai,
+            'jarakTempuh' => $jarakTempuh,
+            'biayaMaintenance' => self::BIAYA_MAINTENANCE_PER_KM
+        ]);
     }
 }

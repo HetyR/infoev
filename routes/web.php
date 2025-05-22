@@ -178,8 +178,13 @@ Route::get('/merek/{brand}', [BrandController::class, 'show'])->name('brand.show
 Route::get('/merek', [BrandController::class, 'index'])->name('brand.index');
 Route::get('/tipe/{type}', [TypeController::class, 'show'])->name('type.show');
 Route::get('/tipe', [TypeController::class, 'index'])->name('type.index');
+
+
+// Kalkulasi
 Route::get('/kalkulasi', [KalkulasiController::class, 'index'])->name('kalkulasi.index');
-// Taruh di bagian akhir
+Route::post('/kalkulasi/hitung/{vehicleId}', [KalkulasiController::class, 'hitungBiaya']);
+
+
 Route::get('/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
 Route::post('/comment/store', [CommentController::class, 'store'])->name('comment.post');
 Route::post('/vehicle/toggle-love/{id}', [VehicleController::class, 'toggleLove'])->name('vehicle.toggleLove');
