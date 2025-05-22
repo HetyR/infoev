@@ -163,7 +163,7 @@ Route::middleware('auth')->group(function () {
 // Charger
 Route::get('/charger', [ChargerController::class,'index'])->name('charger.index');
 Route::get('/charger/search', [ChargerController::class, 'search'])->name('charger.search');
-Route::get('/charging-stations', [ChargingStationController::class, 'index'])->name('charging.stations');
+// Route::get('/charging-stations', [ChargingStationController::class, 'index'])->name('charging.stations');
 
 
 

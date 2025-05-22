@@ -39,7 +39,7 @@
             </div>
         </div>
 <!-- Layout Dua Kolom dengan Tampilan Card -->
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mt-4">
+{{-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mt-4">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Kolom Kiri -->
         <div class="bg-gradient-to-b from-white to-gray-50 rounded-2xl shadow-lg p-6 border border-gray-100">
@@ -55,9 +55,9 @@
                 <li><a href="#" class="flex items-center gap-2 hover:text-yellow-600 transition"><span class="bg-yellow-100 text-yellow-600 px-2 py-0.5 rounded-full text-xs font-semibold">Tips</span>Tips Efisiensi</a></li>
                 <li><a href="#" class="flex items-center gap-2 hover:text-purple-600 transition"><span class="bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full text-xs font-semibold">Info</span>Berita Terkait</a></li>
             </ul>
-        </div>
+        </div> --}}
 
-<!-- Kolom Kanan -->
+{{-- <!-- Kolom Kanan -->
 <div class="md:col-span-2 bg-white rounded-2xl shadow-lg border border-gray-100 p-8 space-y-8">
     <!-- Header Form -->
     <div class="border-b pb-4">
@@ -107,10 +107,10 @@
             </button>
         </div>
     </form>
-</div>
+</div> --}}
 
 
-        {{-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             
             <!-- Calculator Section - 2 Kolom -->
             <div class="flex flex-col xl:flex-row gap-8 mb-12">
@@ -582,5 +582,5 @@
                 }, index * 100);
             });
         }
-    </script> --}}
+    </script>
 </x-layouts.main>
