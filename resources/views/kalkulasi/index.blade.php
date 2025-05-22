@@ -28,62 +28,65 @@
         <x-menu.title-header title="Kalkulasi Biaya Kendaraan Listrik" />
     @endif
 
-    <section class="w-full px-4 py-12 flex justify-center bg-gray-50">
-        <div class="w-full max-w-4xl bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
-            <div class="bg-gradient-to-r from-blue-700 to-blue-900 px-8 py-6">
-                <h2 class="text-3xl font-bold text-white">Kalkulasi Biaya Kendaraan Listrik</h2>
-            </div>
+    <section class="w-full px-6 py-12 bg-gray-50 flex justify-center">
+        <div class="w-full max-w-7xl bg-white rounded-xl shadow-xl p-8 border border-gray-200">
+            <div class="flex flex-col md:flex-row gap-8">
+                <!-- Form Section -->
+                <div class="md:w-1/2 space-y-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Input Data Kendaraan</h2>
+                    <form id="kalkulasiForm" class="space-y-6">
+                        <div>
+                            <label for="vehicle" class="block text-base font-medium text-gray-700 mb-2">Model Kendaraan</label>
+                            <select id="vehicle" name="vehicle" required
+                                class="tom-select w-full border border-gray-300 rounded-md shadow-sm text-base px-5 py-3 focus:ring-2 focus:ring-blue-600 focus:border-blue-600">
+                                <option value="">Pilih Kendaraan</option>
+                                @foreach ($vehicles as $vehicle)
+                                    <option value="{{ $vehicle->id }}">{{ $vehicle->brand->name }} - {{ $vehicle->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-            <div class="p-8 space-y-8">
-                <form id="kalkulasiForm" class="space-y-6">
-                    <div>
-                        <label for="vehicle" class="block text-base font-medium text-gray-700 mb-2">Model Kendaraan</label>
-                        <select id="vehicle" name="vehicle" required
-                            class="tom-select w-full border border-gray-300 rounded-md shadow-sm text-base px-5 py-3 focus:ring-2 focus:ring-blue-600 focus:border-blue-600">
-                            <option value="">Pilih Kendaraan</option>
-                            @foreach ($vehicles as $vehicle)
-                                <option value="{{ $vehicle->id }}">{{ $vehicle->brand->name }} - {{ $vehicle->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="rata_rata_berkendara" class="block text-base font-medium text-gray-700 mb-2">Rata-rata Berkendara per Hari</label>
-                        <div class="flex items-center space-x-4">
-                            <input type="range" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                                   min="1" max="300" id="rata_rata_berkendara" value="30">
-                            <div class="w-32">
-                                <input type="text" id="rata_rata_display"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-md text-right bg-gray-100"
-                                       value="30 KM" readonly>
+                        <div>
+                            <label for="rata_rata_berkendara" class="block text-base font-medium text-gray-700 mb-2">Rata-rata Berkendara per Hari</label>
+                            <div class="flex items-center space-x-4">
+                                <input type="range" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                    min="1" max="300" id="rata_rata_berkendara" value="30">
+                                <div class="w-32">
+                                    <input type="text" id="rata_rata_display"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-md text-right bg-gray-100"
+                                        value="30 KM" readonly>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div>
-                        <label for="harga_listrik" class="block text-base font-medium text-gray-700 mb-2">Harga Listrik</label>
-                        <div class="flex items-center space-x-4">
-                            <input type="range" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                                   min="1000" max="2600" step="5" id="harga_listrik" value="1445">
-                            <div class="w-32">
-                                <input type="text" id="harga_listrik_display"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-md text-right bg-gray-100"
-                                       value="Rp 1445 KWH" readonly>
+                        <div>
+                            <label for="harga_listrik" class="block text-base font-medium text-gray-700 mb-2">Harga Listrik</label>
+                            <div class="flex items-center space-x-4">
+                                <input type="range" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                    min="1000" max="2600" step="5" id="harga_listrik" value="1445">
+                                <div class="w-32">
+                                    <input type="text" id="harga_listrik_display"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-md text-right bg-gray-100"
+                                        value="Rp 1445 KWH" readonly>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div>
-                        <button type="submit"
-                            class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-md shadow-md transition">
-                            Hitung Sekarang
-                        </button>
-                    </div>
-                </form>
+                        <div>
+                            <button type="submit"
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-md shadow-md transition">
+                                Hitung Sekarang
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
-                <div id="hasilKalkulasi" class="hidden bg-gray-100 rounded-lg p-6 border border-gray-300">
-                    <h4 class="text-2xl font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-300">Hasil Kalkulasi</h4>
-                    <div id="hasilDetail" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
+                <!-- Result Section -->
+                <div class="md:w-1/2">
+                    <div id="hasilKalkulasi" class="hidden bg-gray-100 rounded-lg p-6 border border-gray-300">
+                        <h4 class="text-2xl font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-300">Hasil Kalkulasi</h4>
+                        <div id="hasilDetail" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -132,27 +135,27 @@
                     document.getElementById('hasilKalkulasi').classList.remove('hidden');
 
                     container.innerHTML = `
-                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition">
+                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
                             <p class="text-sm text-gray-500">Biaya per KM</p>
                             <p class="text-lg font-bold text-blue-600">Rp ${hasil.biaya_per_kilometer}</p>
                         </div>
-                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition">
+                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
                             <p class="text-sm text-gray-500">Biaya per 100 KM</p>
                             <p class="text-lg font-bold text-blue-600">Rp ${hasil.biaya_per_100_kilometer}</p>
                         </div>
-                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition">
+                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
                             <p class="text-sm text-gray-500">Biaya Isi Penuh</p>
                             <p class="text-lg font-bold text-blue-600">Rp ${hasil.biaya_pengisian_penuh}</p>
                         </div>
-                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition">
+                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
                             <p class="text-sm text-gray-500">Biaya Harian</p>
                             <p class="text-lg font-bold text-blue-600">Rp ${hasil.biaya_harian}</p>
                         </div>
-                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition">
+                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
                             <p class="text-sm text-gray-500">Biaya Bulanan</p>
                             <p class="text-lg font-bold text-blue-600">Rp ${hasil.biaya_bulanan}</p>
                         </div>
-                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition">
+                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
                             <p class="text-sm text-gray-500">Jarak Tempuh / Isi</p>
                             <p class="text-lg font-bold text-blue-600">${hasil.jarak_tempuh_per_pengisian} KM</p>
                         </div>
