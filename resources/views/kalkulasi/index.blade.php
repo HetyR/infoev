@@ -38,71 +38,61 @@
                 </div>
             </div>
         </div>
-<!-- Layout Dua Kolom dengan Tampilan Card -->
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mt-4">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Kolom Kiri -->
-        <div class="bg-gradient-to-b from-white to-gray-50 rounded-2xl shadow-lg p-6 border border-gray-100">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2"
-                     viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
-                                                 d="M9.75 3.75h4.5m-7.5 3h10.5m-12 3h13.5m-15 3h16.5M3.75 18h16.5"/></svg>
-                Informasi Tambahan
-            </h2>
-            <ul class="space-y-3 text-sm text-gray-600">
-                <li><a href="#" class="flex items-center gap-2 hover:text-blue-600 transition"><span class="bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full text-xs font-semibold">EV</span>Jenis Kendaraan</a></li>
-                <li><a href="#" class="flex items-center gap-2 hover:text-green-600 transition"><span class="bg-green-100 text-green-600 px-2 py-0.5 rounded-full text-xs font-semibold">VS</span>Perbandingan EV</a></li>
-                <li><a href="#" class="flex items-center gap-2 hover:text-yellow-600 transition"><span class="bg-yellow-100 text-yellow-600 px-2 py-0.5 rounded-full text-xs font-semibold">Tips</span>Tips Efisiensi</a></li>
-                <li><a href="#" class="flex items-center gap-2 hover:text-purple-600 transition"><span class="bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full text-xs font-semibold">Info</span>Berita Terkait</a></li>
-            </ul>
-        </div>
 
-        <!-- Kolom Kanan -->
-        <div class="md:col-span-2 bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-            <div class="mb-6 border-b pb-4 border-gray-200">
-                <h2 class="text-2xl font-bold text-gray-900 mb-1">Kalkulasi Biaya Kendaraan Listrik</h2>
-                <p class="text-sm text-gray-500">Gunakan slider untuk menyesuaikan data kalkulasi secara interaktif.</p>
-            </div>
 
-            <form action="#" method="POST" class="space-y-6">
-                <!-- Pilih Kendaraan -->
-                <div>
-                    <label for="vehicle" class="block text-sm font-medium text-gray-700 mb-1">Pilih Kendaraan</label>
-                    <select id="vehicle" name="vehicle"
-                            class="block w-full rounded-lg border border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 transition">
-                        <option value="">-- Pilih Kendaraan --</option>
-                        <option>Mobil Listrik A</option>
-                        <option>Motor Listrik B</option>
-                    </select>
-                </div>
-
-                <!-- Slider Harga Listrik -->
-                <div>
-                    <label for="kwh_price" class="block text-sm font-medium text-gray-700 mb-1">Harga Listrik (Rp/kWh): <span id="kwhValue" class="font-semibold text-blue-600">1500</span></label>
-                    <input type="range" id="kwh_price" name="kwh_price" min="1000" max="3000" step="10"
-                           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                           oninput="document.getElementById('kwhValue').innerText = this.value">
-                </div>
-
-                <!-- Slider Jarak Tempuh -->
-                <div>
-                    <label for="distance" class="block text-sm font-medium text-gray-700 mb-1">Jarak Tempuh Harian (km): <span id="kmValue" class="font-semibold text-blue-600">50</span></label>
-                    <input type="range" id="distance" name="distance" min="0" max="200" step="1"
-                           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                           oninput="document.getElementById('kmValue').innerText = this.value">
-                </div>
-
-                <!-- Tombol Submit -->
-                <div class="pt-2">
-                    <button type="submit"
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all">
-                        🔍 Hitung Biaya Sekarang
-                    </button>
-                </div>
-            </form>
-        </div>
+<!-- Kolom Kanan -->
+<div class="md:col-span-2 bg-white rounded-2xl shadow-lg border border-gray-100 p-8 space-y-8">
+    <!-- Header Form -->
+    <div class="border-b pb-4">
+        <h2 class="text-2xl font-bold text-gray-900 mb-1">Kalkulasi Biaya Kendaraan Listrik</h2>
+        <p class="text-sm text-gray-500">Gunakan data di bawah untuk menghitung estimasi biaya harian kendaraan listrik Anda.</p>
     </div>
+
+    <form action="#" method="POST" class="space-y-6">
+        <!-- Pilih Kendaraan -->
+        <div class="space-y-1">
+            <label for="vehicle" class="block text-sm font-medium text-gray-700">Pilih Kendaraan</label>
+            <select id="vehicle" name="vehicle"
+                    class="block w-full rounded-lg border border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 transition text-sm">
+                <option value="">-- Pilih Kendaraan --</option>
+                <option>Mobil Listrik A</option>
+                <option>Motor Listrik B</option>
+            </select>
+        </div>
+
+        <!-- Harga Listrik (Slider) -->
+        <div class="space-y-2">
+            <div class="flex justify-between items-center">
+                <label for="kwh_price" class="text-sm font-medium text-gray-700">Harga Listrik (Rp/kWh)</label>
+                <span id="kwhValue" class="text-blue-600 font-semibold text-sm">1500</span>
+            </div>
+            <input type="range" id="kwh_price" name="kwh_price" min="1000" max="3000" step="10"
+                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                   oninput="document.getElementById('kwhValue').innerText = this.value">
+        </div>
+
+        <!-- Jarak Tempuh (Slider) -->
+        <div class="space-y-2">
+            <div class="flex justify-between items-center">
+                <label for="distance" class="text-sm font-medium text-gray-700">Jarak Tempuh Harian (km)</label>
+                <span id="kmValue" class="text-blue-600 font-semibold text-sm">50</span>
+            </div>
+            <input type="range" id="distance" name="distance" min="0" max="200" step="1"
+                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                   oninput="document.getElementById('kmValue').innerText = this.value">
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t pt-4">
+            <button type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all text-center">
+                🔍 Hitung Biaya Sekarang
+            </button>
+        </div>
+    </form>
 </div>
+
+
 
         {{-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             
