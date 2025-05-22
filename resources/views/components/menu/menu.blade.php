@@ -30,7 +30,7 @@
             </li>
 
             <li>
-                <a href="" class="block px-8 py-4 hover:bg-purple-900 hover:text-white">CHARGING STATION</a>
+                <a href="{{ route('charger.index') }}" class="block px-8 py-4 hover:bg-purple-900 hover:text-white">CHARGING STATION</a>
             </li>
             @auth
                 @if (auth()->user()->role == 1)

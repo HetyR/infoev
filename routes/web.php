@@ -29,6 +29,9 @@ use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\PrivacyController;
 use App\Http\Controllers\backend\DashboardController;
 use App\Http\Controllers\KalkulasiController;
+use App\Http\Controllers\ChargerController;
+use App\Http\Controllers\ChargingStationController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -157,6 +160,13 @@ Route::middleware('auth')->group(function () {
     });
 });
 
+// Charger
+Route::get('/charger', [ChargerController::class,'index'])->name('charger.index');
+Route::get('/charger/search', [ChargerController::class, 'search'])->name('charger.search');
+Route::get('/charging-stations', [ChargingStationController::class, 'index'])->name('charging.stations');
+
+
+
 // Compare
 Route::get('/compare', [CompareController::class, 'index'])->name('compare.index');
 Route::post('/compare/add', [CompareController::class, 'addToCompare'])->name('compare.add');
@@ -188,6 +198,8 @@ Route::post('/kalkulasi/hitung/{vehicleId}', [KalkulasiController::class, 'hitun
 Route::get('/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
 Route::post('/comment/store', [CommentController::class, 'store'])->name('comment.post');
 Route::post('/vehicle/toggle-love/{id}', [VehicleController::class, 'toggleLove'])->name('vehicle.toggleLove');
+
+
 
 // Kalkulasi
 // Route::get('/vehicle/kalkulasi/index', [VehicleController::class, 'showKalkulasiForm'])->name('vehicle.kalkulasi.form');
