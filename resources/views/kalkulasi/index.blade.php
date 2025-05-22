@@ -57,7 +57,7 @@
             </ul>
         </div>
 
-<!-- Kolom Kanan -->
+{{-- <!-- Kolom Kanan -->
 <div class="md:col-span-2 bg-white rounded-2xl shadow-lg border border-gray-100 p-8 space-y-8">
     <!-- Header Form -->
     <div class="border-b pb-4">
@@ -107,10 +107,10 @@
             </button>
         </div>
     </form>
-</div>
+</div> --}}
 
 
-        {{-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             
             <!-- Calculator Section - 2 Kolom -->
             <div class="flex flex-col xl:flex-row gap-8 mb-12">
@@ -582,5 +582,5 @@
                 }, index * 100);
             });
         }
-    </script> --}}
+    </script>
 </x-layouts.main>
