@@ -16,7 +16,7 @@ class FavoriteController extends Controller
          $user = auth()->user();
          if ($user) {
              // Mengambil data kendaraan yang disukai oleh pengguna beserta vehicle_id
-             $kendaraanDisukai = $user->favoriteVehicles()->get(['vehicle_id']);
+             $kendaraanDisukai = $user->lovedVehicles()->orderByPivot('created_at', 'desc')->pluck('vehicle_id');
 
              // Inisialisasi array untuk menampung informasi kendaraan
              $informasiKendaraan = [];

@@ -24,29 +24,33 @@ class HomeController extends Controller
         };
 
         $stickies = Blog::with('thumbnail')
-                        ->select('sticky_articles.*', 'blogs.*')
-                        ->join('sticky_articles', 'blogs.id', '=', 'sticky_articles.blog_id')
-                        ->where('blogs.published', true)
-                        ->orderBy('sticky_articles.created_at', 'desc')
-                        ->get()
-                        ->each(function($item) use ($getImageUrl) {
-                            $item->thumbnail_url = $getImageUrl($item->thumbnail->path ?? null);
-                        });
+            ->select('sticky_articles.*', 'blogs.*')
+            ->join('sticky_articles', 'blogs.id', '=', 'sticky_articles.blog_id')
+            ->where('blogs.published', true)
+            ->orderBy('sticky_articles.created_at', 'desc')
+            ->get()
+            ->each(function ($item) use ($getImageUrl) {
+                $item->thumbnail_url = $getImageUrl($item->thumbnail->path ?? null);
+            });
 
         $featured = Blog::with('thumbnail')
-                        ->latest()
-                        ->where('published', true)
-                        ->where('featured', true)
-                        ->limit(3)
-                        ->get()
-                        ->each(function($item) use ($getImageUrl) {
-                            $item->thumbnail_url = $getImageUrl($item->thumbnail->path ?? null);
-                        });
+            ->latest()
+            ->where('published', true)
+            ->where('featured', true)
+            ->limit(3)
+            ->get()
+            ->each(function ($item) use ($getImageUrl) {
+                $item->thumbnail_url = $getImageUrl($item->thumbnail->path ?? null);
+            });
 
         $newsLimit = 3 - $featured->count();
         if ($newsLimit > 0 && $newsLimit <= 3) {
-            $remainderArticles = Blog::with('thumbnail')->latest()->where('published', true)->limit($newsLimit)->get()
-                ->each(function($item) use ($getImageUrl) {
+            $remainderArticles = Blog::with('thumbnail')
+                ->latest()
+                ->where('published', true)
+                ->limit($newsLimit)
+                ->get()
+                ->each(function ($item) use ($getImageUrl) {
                     $item->thumbnail_url = $getImageUrl($item->thumbnail->path ?? null);
                 });
             $stickies = $stickies->concat($featured)->concat($remainderArticles);
@@ -70,31 +74,58 @@ class HomeController extends Controller
         //                 ->orderBy('vehicles_count', 'desc')
         //                 ->get();
 
-        $posts = Blog::with('thumbnail')->latest()->where('published', true)->limit(15)->get()
-            ->each(function($item) use ($getImageUrl) {
+        $posts = Blog::with('thumbnail')
+            ->latest()
+            ->where('published', true)
+            ->limit(15)
+            ->get()
+            ->each(function ($item) use ($getImageUrl) {
                 $item->thumbnail_url = $getImageUrl($item->thumbnail->path ?? null);
             });
 
-        $recentVehicles = Vehicle::with(['brand', 'pictures' => function($query) {
-            $query->where('thumbnail', 1);
-        }])->latest()->limit(8)->get()
-            ->each(function($item) use ($getImageUrl) {
+        $recentVehicles = Vehicle::with([
+            'brand',
+            'pictures' => function ($query) {
+                $query->where('thumbnail', 1);
+            },
+        ])
+            ->latest()
+            ->limit(8)
+            ->get()
+            ->each(function ($item) use ($getImageUrl) {
                 $item->brand_logo_url = $getImageUrl($item->brand->logo->path ?? null);
                 $item->thumbnail_url = $getImageUrl(optional($item->pictures->first())->path);
             });
 
-        $popularVehicles = Vehicle::with(['brand', 'pictures' => function($query) {
-            $query->where('thumbnail', 1);
-        }])
-        ->whereHas('views', fn (Builder $query) => $query->where('created_at', '>', now()->subMonths(3)))
-        ->withCount('views')
-        ->orderBy('views_count', 'desc')
-        ->limit(10)
-        ->get()
-        ->each(function($item) use ($getImageUrl) {
-            $item->brand_logo_url = $getImageUrl($item->brand->logo->path ?? null);
-            $item->thumbnail_url = $getImageUrl(optional($item->pictures->first())->path);
-        });
+        $popularVehicles = Vehicle::with([
+            'brand',
+            'pictures' => function ($query) {
+                $query->where('thumbnail', 1);
+            },
+        ])
+            ->whereHas('views', fn(Builder $query) => $query->where('created_at', '>', now()->subMonths(3)))
+            ->withCount('views')
+            ->orderBy('views_count', 'desc')
+            ->limit(10)
+            ->get()
+            ->each(function ($item) use ($getImageUrl) {
+                $item->brand_logo_url = $getImageUrl($item->brand->logo->path ?? null);
+                $item->thumbnail_url = $getImageUrl(optional($item->pictures->first())->path);
+            }); 
+
+        $latestVehicles = Vehicle::with([
+            'brand',
+            'pictures' => function ($query) {
+                $query->where('thumbnail', 1);
+            },
+        ])
+            ->orderBy('created_at', 'desc') // Urutkan berdasarkan waktu dibuat, dari yang terbaru
+            ->limit(10) // Batasi 10 data
+            ->get()
+            ->each(function ($item) use ($getImageUrl) {
+                $item->brand_logo_url = $getImageUrl($item->brand->logo->path ?? null);
+                $item->thumbnail_url = $getImageUrl(optional($item->pictures->first())->path);
+            });
 
         $logo = Option::where('type', 'logo')->with('thumbnail')->first();
         $logo_url = $getImageUrl($logo->thumbnail->path ?? null);
@@ -106,25 +137,22 @@ class HomeController extends Controller
             'stickies' => $stickies,
             // 'recentVehicles' => $recentVehicles,
             'popularVehicles' => $popularVehicles,
-            'logo' => $logo_url
+            'latestVehicles' => $latestVehicles,
+            'logo' => $logo_url,
         ]);
     }
 
-
-    public function search(Request $request) {
+    public function search(Request $request)
+    {
         $getImageUrl = function ($image) {
             return $image ? asset('storage/' . $image->path) : null;
         };
 
         $searchVehicleIds = Vehicle::search($request->q)->get()->pluck('id');
         // $vehicles = Spec::find(1)
-        $vehicles = Spec::first()
-                        ->vehicles()
-                        ->wherePivotIn('vehicle_id', $searchVehicleIds)
-                        ->orderByPivot('value', 'desc')
-                        ->get();
+        $vehicles = Spec::first()->vehicles()->wherePivotIn('vehicle_id', $searchVehicleIds)->orderByPivot('value', 'desc')->get();
 
-        $vehicles->each(function($vehicle) use ($getImageUrl) {
+        $vehicles->each(function ($vehicle) use ($getImageUrl) {
             $firstPicture = $vehicle->pictures->first();
             $vehicle->thumbnail_url = $firstPicture ? $getImageUrl($firstPicture) : null;
             // Hide the pictures attribute
@@ -133,7 +161,6 @@ class HomeController extends Controller
 
         return response()->json([
             'vehicles' => $vehicles,
-
         ]);
     }
 
@@ -147,23 +174,22 @@ class HomeController extends Controller
         $timestamp = $timestamp ? date('Y-m-d H:i:s', strtotime($timestamp)) : now()->subDay()->toDateTimeString();
 
         // Mengambil data berita terbaru
-        $newBlog = Blog::with('thumbnail')
-                       ->where('published', true)
-                       ->where('created_at', '>', $timestamp)
-                       ->orderBy('created_at', 'desc')
-                       ->first();
+        $newBlog = Blog::with('thumbnail')->where('published', true)->where('created_at', '>', $timestamp)->orderBy('created_at', 'desc')->first();
 
         if ($newBlog) {
             $newBlog->thumbnail_url = $getImageUrl($newBlog->thumbnail->path ?? null);
         }
 
         // Mengambil data kendaraan terbaru
-        $newVehicle = Vehicle::with(['brand', 'pictures' => function($query) {
-            $query->where('thumbnail', 1);
-        }])
-        ->where('created_at', '>', $timestamp)
-        ->latest()
-        ->first();
+        $newVehicle = Vehicle::with([
+            'brand',
+            'pictures' => function ($query) {
+                $query->where('thumbnail', 1);
+            },
+        ])
+            ->where('created_at', '>', $timestamp)
+            ->latest()
+            ->first();
 
         if ($newVehicle) {
             $newVehicle->brand_logo_url = $getImageUrl($newVehicle->brand->logo->path ?? null);
@@ -172,10 +198,7 @@ class HomeController extends Controller
 
         return response()->json([
             'newBlog' => $newBlog,
-            'newVehicle' => $newVehicle
+            'newVehicle' => $newVehicle,
         ]);
     }
-
-
-
 }

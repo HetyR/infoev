@@ -16,14 +16,15 @@ use App\Http\Controllers\Api\ChargerStationController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Api\SpecTestController;
 
-use App\Http\Controllers\Api\KeranjangController;
+use App\Http\Controllers\Api\FavoriteController;
 
 
 
 //Update Route Keranjang Loved Vehicle
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/keranjang', [KeranjangController::class, 'index']);
-    Route::delete('/keranjang/{vehicleId}', [KeranjangController::class, 'remove']);
+    Route::get('/favorites', [FavoriteController::class, 'index']);          // Menampilkan daftar favorit
+    Route::post('/favorites', [FavoriteController::class, 'store']);         // Menambahkan kendaraan ke favorit
+    Route::delete('/favorites/{vehicleId}', [FavoriteController::class, 'remove']);  // Menghapus kendaraan dari favorit
 });
 
 // Route Testing
@@ -46,7 +47,7 @@ Route::prefix('v2')->group(function () {
 |
 */
 
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', [HomeController::class, 'index']); 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
