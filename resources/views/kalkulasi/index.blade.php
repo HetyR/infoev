@@ -33,19 +33,73 @@
         <div class="bg-gradient-to-r from-slate-50 to-gray-100 border-b border-gray-200">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div class="text-center">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-3">Kalkulator Biaya EV</h1>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-3 mt-4">Kalkulator Biaya EV</h1>
                     <p class="text-lg text-gray-600 max-w-2xl mx-auto">Hitung estimasi biaya operasional kendaraan listrik Anda dengan akurat berdasarkan data terkini</p>
                 </div>
             </div>
         </div>
+<!-- Layout Dua Kolom dengan Tampilan Card -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mt-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Kolom Kiri (Card) -->
+        <div class="bg-white rounded-2xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Informasi Tambahan</h2>
+            <div class="space-y-3 text-gray-600 text-sm">
+                <a href="#" class="block hover:text-blue-600 transition">Jenis Kendaraan</a>
+                <a href="#" class="block hover:text-blue-600 transition">Perbandingan EV</a>
+                <a href="#" class="block hover:text-blue-600 transition">Tips Efisiensi</a>
+                <a href="#" class="block hover:text-blue-600 transition">Berita Terkait</a>
+            </div>
+        </div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Kolom Kanan (Card) -->
+        <div class="md:col-span-2 bg-white rounded-2xl shadow-md p-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Kalkulasi Biaya Kendaraan Listrik</h2>
+
+            <form action="#" method="POST" class="space-y-5">
+                <!-- Pilih Kendaraan -->
+                <div>
+                    <label for="vehicle" class="block text-sm font-medium text-gray-700 mb-1">Pilih Kendaraan</label>
+                    <select id="vehicle" name="vehicle" class="block w-full rounded-lg border border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">-- Pilih Kendaraan --</option>
+                        <option>Mobil Listrik A</option>
+                        <option>Motor Listrik B</option>
+                    </select>
+                </div>
+
+                <!-- Harga Listrik -->
+                <div>
+                    <label for="kwh_price" class="block text-sm font-medium text-gray-700 mb-1">Harga Listrik (Rp/kWh)</label>
+                    <input type="number" id="kwh_price" name="kwh_price" placeholder="Contoh: 1444.70"
+                           class="block w-full rounded-lg border border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- Jarak Tempuh -->
+                <div>
+                    <label for="distance" class="block text-sm font-medium text-gray-700 mb-1">Jarak Tempuh Harian (km)</label>
+                    <input type="number" id="distance" name="distance" placeholder="Contoh: 50"
+                           class="block w-full rounded-lg border border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- Tombol Submit -->
+                <div class="pt-4">
+                    <button type="submit"
+                            class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition">
+                        Hitung Biaya
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+        {{-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             
             <!-- Calculator Section - 2 Kolom -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            <div class="flex flex-col xl:flex-row gap-8 mb-12">
                 
                 <!-- Form Section -->
-                <div>
+                <div class="xl:w-1/2 flex-shrink-0">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <!-- Header dengan gradient -->
                         <div class="px-6 py-5 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
@@ -146,7 +200,7 @@
                 </div>
 
                 <!-- Results Section -->
-                <div>
+                <div class="xl:w-1/2 flex-shrink-0">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-fit">
                         <!-- Header dengan gradient -->
                         <div class="px-6 py-5 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
@@ -511,5 +565,5 @@
                 }, index * 100);
             });
         }
-    </script>
+    </script> --}}
 </x-layouts.main>
