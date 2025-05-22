@@ -38,7 +38,24 @@
                 </div>
             </div>
         </div>
-
+<!-- Layout Dua Kolom dengan Tampilan Card -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mt-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Kolom Kiri -->
+        <div class="bg-gradient-to-b from-white to-gray-50 rounded-2xl shadow-lg p-6 border border-gray-100">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2"
+                     viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
+                                                 d="M9.75 3.75h4.5m-7.5 3h10.5m-12 3h13.5m-15 3h16.5M3.75 18h16.5"/></svg>
+                Informasi Tambahan
+            </h2>
+            <ul class="space-y-3 text-sm text-gray-600">
+                <li><a href="#" class="flex items-center gap-2 hover:text-blue-600 transition"><span class="bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full text-xs font-semibold">EV</span>Jenis Kendaraan</a></li>
+                <li><a href="#" class="flex items-center gap-2 hover:text-green-600 transition"><span class="bg-green-100 text-green-600 px-2 py-0.5 rounded-full text-xs font-semibold">VS</span>Perbandingan EV</a></li>
+                <li><a href="#" class="flex items-center gap-2 hover:text-yellow-600 transition"><span class="bg-yellow-100 text-yellow-600 px-2 py-0.5 rounded-full text-xs font-semibold">Tips</span>Tips Efisiensi</a></li>
+                <li><a href="#" class="flex items-center gap-2 hover:text-purple-600 transition"><span class="bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full text-xs font-semibold">Info</span>Berita Terkait</a></li>
+            </ul>
+        </div>
 
 <!-- Kolom Kanan -->
 <div class="md:col-span-2 bg-white rounded-2xl shadow-lg border border-gray-100 p-8 space-y-8">
@@ -91,7 +108,6 @@
         </div>
     </form>
 </div>
-
 
 
         {{-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
