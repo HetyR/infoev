@@ -40,54 +40,6 @@ class TypeController extends Controller
 
 
 
-    // public function show(Type $type)
-    // {
-    //     // Ambil objek merek. Gantilah 1 dengan ID merek yang sesuai
-    //     $brand = Brand::findOrFail(1); // Misalnya, mengambil Brand dengan ID 1
-
-    //     $getImageUrl = function ($image) {
-    //         return $image ? asset('storage/' . $image->path) : null;
-    //     };
-
-    //     // Memuat gambar dari URL atas untuk setiap kendaraan
-    //     $vehicles = Spec::find(1)
-    //                     ->vehicles()
-    //                     ->where('brand_id', $brand->id)
-    //                     ->where('type_id', $type->id)
-    //                     ->orderByPivot('value', 'desc')
-    //                     ->get(); // Mengambil semua kendaraan tanpa pagination
-
-    //     // Memproses setiap kendaraan untuk mendapatkan thumbnail dan data spesifikasi
-    //     $vehicles->transform(function($vehicle) use ($getImageUrl) {
-    //         $firstPicture = $vehicle->pictures->first();
-    //         $vehicle->thumbnail_url = $firstPicture ? $getImageUrl($firstPicture) : null;
-
-    //         // Hanya ambil data yang diperlukan dari spesifikasi
-    //         $vehicle->spec = [
-    //             'spec_id' => $vehicle->pivot->spec_id,
-    //             'value' => $vehicle->pivot->value,
-    //         ];
-
-    //         // Hapus data yang tidak diperlukan
-    //         unset($vehicle->brand);
-    //         unset($vehicle->pictures);
-    //         unset($vehicle->pivot);
-
-    //         return $vehicle;
-    //     });
-
-    //     // Ambil data tipe kendaraan
-    //     $typeData = [
-    //         'type_id' => $type->id,
-    //         'type_name' => $type->slug,
-    //         'name_brand' => $brand->name, // Hanya menampilkan nama merek
-    //         'vehicles' => $vehicles,
-    //     ];
-
-    //     // Mengembalikan respons JSON dengan data tipe kendaraan dan kendaraan
-    //     return response()->json($typeData);
-    // }
-
     public function show(Type $type) {
         $getImageUrl = function ($image) {
             return $image ? asset('storage/' . $image->path) : null;
@@ -114,5 +66,8 @@ class TypeController extends Controller
 
         return response()->json($data);
     }
+
+
+ 
 
 }

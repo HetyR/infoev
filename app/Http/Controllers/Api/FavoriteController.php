@@ -3,25 +3,29 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Vehicle;
+use App\Models\User;
 
 class FavoriteController extends Controller
 {
     public function index(Request $request)
     {
-        $user = auth('sanctum')->user();
-
+        $user = Auth::user();
         if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized.',
-                'data' => null,
-            ], 401);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Unauthorized.',
+                    'data' => null,
+                ],
+                401,
+            );
         }
 
         // Ambil jumlah per halaman dari query string atau default 10
-        $perPage = $request->query('page', 10);
+        $perPage = $request->query('per_page', 10);
 
         // Ambil data kendaraan favorit dengan pagination
         $vehicles = $user
@@ -32,19 +36,19 @@ class FavoriteController extends Controller
 
         // Tambahkan thumbnail_url
         $vehicles->getCollection()->transform(function ($vehicle) {
-            $vehicle->thumbnail_url = $vehicle->pictures->where('thumbnail', 1)->first()
-                ? asset('storage/' . $vehicle->pictures->where('thumbnail', 1)->first()->path)
-                : asset('img/placeholder-md.png');
+            $vehicle->thumbnail_url = $vehicle->pictures->where('thumbnail', 1)->first() ? asset('storage/' . $vehicle->pictures->where('thumbnail', 1)->first()->path) : asset('img/placeholder-md.png');
             return $vehicle;
         });
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Daftar kendaraan disukai berhasil diambil.',
-            'data' => $vehicles
-        ], 200);
+        return response()->json(
+            [
+                'success' => true,
+                'message' => 'Daftar kendaraan disukai berhasil diambil.',
+                'data' => $vehicles,
+            ],
+            200,
+        );
     }
-
 
     public function store(Request $request)
     {
@@ -73,14 +77,16 @@ class FavoriteController extends Controller
                 [
                     'success' => false,
                     'message' => 'Kendaraan sudah ada dalam daftar disukai.',
-                    'data' => null,
                 ],
                 409,
             ); // Conflict
         }
 
-        // Tambahkan kendaraan ke daftar disukai
-        $user->lovedVehicles()->attach($vehicleId);
+        // Tambahkan kendaraan ke daftar disukai dengan timestamp manual
+        $user->lovedVehicles()->attach($vehicleId, [
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         return response()->json(
             [

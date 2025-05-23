@@ -19,6 +19,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class VehicleController extends Controller
 {
@@ -83,12 +84,21 @@ class VehicleController extends Controller
                 'marketplace_logo' => asset('storage/' . $affiliate->marketplace->logo->path),
             ];
         });
+ 
+        // Cek apakah user login atau guest
+        $user = Auth::guard('sanctum')->user();
+ 
+        $isFavorite = false;
+        if ($user) {
+            $isFavorite = $user->lovedVehicles()->where('vehicle_id', $vehicle->id)->exists(); 
+        }
 
         return response()->json([
             'specCategories' => $specCategories,
             'highlightSpecs' => $highlightSpecs,
             'vehicle' => $vehicle,
             'affiliateLinks' => $affiliateLinks, // Add affiliate links to JSON response
+            'isLoved' => $isFavorite, // Tambahkan flag favorit
             // Add other data here...
         ]);
     }

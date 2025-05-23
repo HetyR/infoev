@@ -102,10 +102,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::post('/merek', [BrandController::class, 'store']);
 
     // Type
-    Route::get('/tipe/{type}', [TypeController::class, 'show'])
-        ->name('type.show');
     Route::get('/tipe', [TypeController::class, 'index'])
         ->name('type.index');
+    Route::get('/tipe/{type}', [TypeController::class, 'show'])
+        ->name('type.show');
 
     // Vehicle
     Route::get('/{vehicle}', [VehicleController::class, 'show'])
