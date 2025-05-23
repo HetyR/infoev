@@ -65,7 +65,7 @@
                                     <label for="vehicle" class="block text-sm font-medium text-gray-800">
                                         Pilih Kendaraan Listrik
                                     </label>
-                                    <select id="vehicle" name="vehicle" required class="tom-select w-full border border-gray-200 rounded-lg shadow-xs px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white">
+                                    <select id="vehicle" name="vehicle" required class="tom-select w-full borderborder-purple-900 rounded-lg shadow-xs px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white">
                                         <option value="">Pilih kendaraan listrik...</option>
                                         @foreach ($vehicles as $vehicle)
                                             <option value="{{ $vehicle->id }}">{{ $vehicle->brand->name }} {{ $vehicle->name }}</option>
@@ -87,7 +87,7 @@
                                             <input type="number" class="w-20 sm:w-24 p-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200" id="rata_rata_input" min="1" max="300" value="30">
                                         </div>
                                         <div class="text-center">
-                                            <span class="inline-flex items-center px-3 py-1 bg-green-50 text-green-800 rounded-full text-sm font-medium">
+                                            <span class="inline-flex items-center px-3 py-1 bg-purple-50 text-purple-800 rounded-full text-sm font-medium">
                                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                                 </svg>
@@ -108,10 +108,10 @@
                                         </div>
                                         <div class="flex items-center space-x-3 sm:space-x-4">
                                             <input type="range" class="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer slider-thumb" min="1000" max="2600" step="5" id="harga_listrik" value="1445">
-                                            <input type="number" class="w-20 sm:w-24 p-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200" id="harga_listrik_input" min="1000" max="2600" step="5" value="1445">
+                                            <input type="number" class="w-20 sm:w-24 p-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-pruple-500 transition-all duration-200" id="harga_listrik_input" min="1000" max="2600" step="5" value="1445">
                                         </div>
                                         <div class="text-center">
-                                            <span class="inline-flex items-center px-3 py-1 bg-green-50 text-green-800 rounded-full text-sm font-medium">
+                                            <span class="inline-flex items-center px-3 py-1 bg-purple-50 text-purple-800 rounded-full text-sm font-medium">
                                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                                 </svg>
@@ -122,7 +122,7 @@
                                 </div>
                                 <!-- Tombol Hitung -->
                                 <div class="pt-2">
-                                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 shadow-xs hover:shadow-sm">
+                                    <button type="submit" class="w-full bg-purple-900 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 shadow-xs hover:shadow-sm">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                         </svg>
@@ -409,55 +409,55 @@
                 label: 'Biaya per KM',
                 value: formatCurrency(hasil.biaya_per_kilometer),
                 icon: '📏',
-                bgColor: 'bg-green-50',
-                borderColor: 'border-green-100',
+                bgColor: 'bg-purple-50',
+                borderColor: 'border-purple-100',
                 textColor: 'text-gray-900',
-                valueColor: 'text-green-600'
+                valueColor: 'text-purple-600'
             }, {
                 label: 'Biaya Harian',
                 value: formatCurrency(hasil.biaya_harian),
                 icon: '📅',
-                bgColor: 'bg-green-50',
-                borderColor: 'border-green-100',
+                bgColor: 'bg-purple-50',
+                borderColor: 'border-purple-100',
                 textColor: 'text-gray-900',
-                valueColor: 'text-green-600'
+                valueColor: 'text-purple-600'
             }, {
                 label: 'Biaya per 100 KM',
                 value: formatCurrency(hasil.biaya_per_100_kilometer),
                 icon: '🛣️',
-                bgColor: 'bg-green-50',
-                borderColor: 'border-green-100',
+             bgColor: 'bg-purple-50',
+                borderColor: 'border-purple-100',
                 textColor: 'text-gray-900',
-                valueColor: 'text-green-600'
+                valueColor: 'text-purple-600'
             }, {
                 label: 'Biaya Isi Penuh',
                 value: formatCurrency(hasil.biaya_pengisian_penuh),
                 icon: '🔌',
-                bgColor: 'bg-green-50',
-                borderColor: 'border-green-100',
+                bgColor: 'bg-purple-50',
+                borderColor: 'border-purple-100',
                 textColor: 'text-gray-900',
-                valueColor: 'text-green-600'
+                valueColor: 'text-purple-600'
             }, {
                 label: 'Biaya Bulanan',
                 value: formatCurrency(hasil.biaya_bulanan),
                 icon: '📊',
-                bgColor: 'bg-green-50',
-                borderColor: 'border-green-100',
+                bgColor: 'bg-purple-50',
+                borderColor: 'border-purple-100',
                 textColor: 'text-gray-900',
-                valueColor: 'text-green-600'
+                valueColor: 'text-purple-600'
             }, {
                 label: 'Jarak per Isi',
                 value: hasil.jarak_tempuh_per_pengisian + ' KM',
                 icon: '⚡',
-                bgColor: 'bg-green-50',
-                borderColor: 'border-green-100',
+               bgColor: 'bg-purple-50',
+                borderColor: 'border-purple-100',
                 textColor: 'text-gray-900',
-                valueColor: 'text-green-600'
+                valueColor: 'text-purple-600'
             }];
 
             // Generate HTML untuk hasil
             container.innerHTML = results.map(item => `
-                <div class="${item.bgColor} ${item.borderColor} border rounded-lg p-4 hover:bg-green-100 transition-all duration-200">
+                <div class="${item.bgColor} ${item.borderColor} border rounded-lg p-4 hover:bg-purple-200 transition-all duration-200">
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center space-x-2">
                             <span class="text-base">${item.icon}</span>
