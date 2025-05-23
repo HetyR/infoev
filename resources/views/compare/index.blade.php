@@ -41,6 +41,10 @@
     </x-slot:footer>
 </x-layouts.main>
 
+
+{{-- Script --}}
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const combinedList = @json($combinedList);

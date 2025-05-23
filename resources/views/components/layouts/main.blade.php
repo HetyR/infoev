@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -14,24 +15,38 @@
 
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
+    @stack('styles')
+
 
     {{ $meta }}
     {{ $css ?? '' }}
     @if (env('APP_ENV') == 'production')
         @if (!is_null(env('GTM_ID')) && !empty(env('GTM_ID')))
-            <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','{{ env('GTM_ID') }}');</script>
+            <script>
+                (function(w, d, s, l, i) {
+                    w[l] = w[l] || [];
+                    w[l].push({
+                        'gtm.start': new Date().getTime(),
+                        event: 'gtm.js'
+                    });
+                    var f = d.getElementsByTagName(s)[0],
+                        j = d.createElement(s),
+                        dl = l != 'dataLayer' ? '&l=' + l : '';
+                    j.async = true;
+                    j.src =
+                        'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+                    f.parentNode.insertBefore(j, f);
+                })(window, document, 'script', 'dataLayer', '{{ env('GTM_ID') }}');
+            </script>
         @endif
     @endif
 </head>
+
 <body class="bg-stone-700 bg-opacity-5">
     @if (env('APP_ENV') == 'production')
         @if (!is_null(env('GTM_ID')) && !empty(env('GTM_ID')))
-            <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ env('GTM_ID') }}" height="0" width="0"
-                    style="display:none;visibility:hidden"></iframe></noscript>
+            <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ env('GTM_ID') }}" height="0"
+                    width="0" style="display:none;visibility:hidden"></iframe></noscript>
         @endif
     @endif
     {{-- Header --}}
@@ -59,7 +74,11 @@
     {{ $footer ?? '' }}
     {{-- End Footer --}}
 
-    <script>document.querySelector('#year').innerText = new Date().getFullYear()</script>
+    <script>
+        document.querySelector('#year').innerText = new Date().getFullYear()
+    </script>
     {{ $js ?? '' }}
+    @stack('scripts')
 </body>
+
 </html>
