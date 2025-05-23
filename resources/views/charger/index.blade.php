@@ -54,7 +54,7 @@
                 <button 
                     type="submit" 
                     class="bg-blue-600 text-white px-6 py-3 font-semibold rounded-md shadow-md hover:bg-blue-700 hover:shadow-lg transition-all duration-200">
-                    🔍 Cari
+                    Cari
                 </button>
             </form>
 

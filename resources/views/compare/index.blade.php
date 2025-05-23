@@ -159,7 +159,8 @@
 
                 // Render judul kategori
                 html +=
-                    `<h4 class="mt-6 font-semibold text-purple-700 border-b-2 border-purple-700 pb-1 mb-2 inline-block">${cat.name}</h4>`;
+                    `<h2 class="hidden md:block mt-4 pl-4 py-2 border-l-8 border-purple-900 uppercase font-bold text-slate-800 mb-6">${cat.name}</h2>`;
+
 
                 // Render tabel spesifikasi
                 html +=
@@ -191,16 +192,22 @@
                             if (veh2?.pivot?.value_desc) val2 += ` (${veh2.pivot.value_desc})`;
                             break;
 
-                        case 'unit':
-                            val1 = veh1?.pivot?.value ?
-                                `${formatNumber(veh1.pivot.value)} ${spec.unit || ''}` : '-';
-                            val2 = veh2?.pivot?.value ?
-                                `${formatNumber(veh2.pivot.value)} ${spec.unit || ''}` : '-';
+case 'unit':
+    if (spec.name.toLowerCase().includes('tahun')) {
+        const val1Num = veh1?.pivot?.value ? Math.round(veh1.pivot.value) : null;
+        const val2Num = veh2?.pivot?.value ? Math.round(veh2.pivot.value) : null;
 
-                            // Tambahkan deskripsi jika ada
-                            if (veh1?.pivot?.value_desc) val1 += ` (${veh1.pivot.value_desc})`;
-                            if (veh2?.pivot?.value_desc) val2 += ` (${veh2.pivot.value_desc})`;
-                            break;
+        val1 = val1Num !== null ? `${val1Num} ${spec.unit || ''}` : '-';
+        val2 = val2Num !== null ? `${val2Num} ${spec.unit || ''}` : '-';
+    } else {
+        val1 = veh1?.pivot?.value ? `${formatNumber(veh1.pivot.value)} ${spec.unit || ''}` : '-';
+        val2 = veh2?.pivot?.value ? `${formatNumber(veh2.pivot.value)} ${spec.unit || ''}` : '-';
+    }
+
+    if (veh1?.pivot?.value_desc) val1 += ` (${veh1.pivot.value_desc})`;
+    if (veh2?.pivot?.value_desc) val2 += ` (${veh2.pivot.value_desc})`;
+    break;
+
 
                         case 'list':
                             val1 = veh1?.pivot?.lists?.map(item => item.list).join(', ') || '-';
