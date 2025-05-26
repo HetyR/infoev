@@ -58,13 +58,13 @@
                 </button>
             </form>
 
+            <div id="map" class="w-full h-[50vh] sm:h-[60vh] lg:h-[70vh] shadow-md mb-10"></div>
+
             @if(isset($places))
                 <div>
                     <h3 class="text-xl font-semibold text-gray-900 mb-4">
                         Hasil untuk: <span class="text-blue-600 italic">{{ $wilayah }}</span>
                     </h3>
-
-                    <div id="map" class="w-full h-[500px] shadow-md mb-10"></div>
 
                     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         @forelse ($places as $place)
@@ -103,33 +103,61 @@
         </div>
     </div>
 
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
-    {{-- Leaflet CSS --}}
     @push('styles')
-        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     @endpush
 
-    {{-- Leaflet JS --}}
     @push('scripts')
-        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
         <script>
             document.addEventListener("DOMContentLoaded", function () {
-                const map = L.map('map').setView([-6.200000, 106.816666], 12);
+                try {
+                    const mapElement = document.getElementById('map');
+                    if (!mapElement) {
+                        console.error("Elemen #map tidak ditemukan di DOM!");
+                        return;
+                    }
 
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors'
-                }).addTo(map);
+                    const map = L.map('map').setView([-7.8119, 112.0049], 12);
 
-                @if(isset($places))
-                    @foreach($places as $place)
-                        @if(isset($place['geometry']['location']))
-                            L.marker([{{ $place['geometry']['location']['lat'] }}, {{ $place['geometry']['location']['lng'] }}])
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(map);
+
+                    const places = @json($places ?? []);
+
+                    if (places && places.length > 0) {
+                        let locations = [];
+                        places.forEach(place => {
+                            if (place.geometry && place.geometry.location && place.geometry.location.lat && place.geometry.location.lng) {
+                                locations.push([place.geometry.location.lat, place.geometry.location.lng]);
+                                L.marker([place.geometry.location.lat, place.geometry.location.lng])
+                                    .addTo(map)
+                                    .bindPopup(`<b>${place.name}</b><br>${place.vicinity || 'Alamat tidak tersedia'}`);
+                            }
+                        });
+
+                        if (locations.length > 0) {
+                            let latSum = locations.reduce((sum, loc) => sum + loc[0], 0) / locations.length;
+                            let lngSum = locations.reduce((sum, loc) => sum + loc[1], 0) / locations.length;
+                            map.setView([latSum, lngSum], 12);
+                        } else {
+                            L.marker([-7.8119, 112.0049])
                                 .addTo(map)
-                                .bindPopup(`<b>{{ $place['name'] }}</b><br>{{ $place['vicinity'] ?? 'Alamat tidak tersedia' }}`);
-                        @endif
-                    @endforeach
-                @endif
+                                .bindPopup('Tidak ada koordinat stasiun pengisian yang tersedia.');
+                        }
+                    } else {
+                        L.marker([-7.8119, 112.0049])
+                            .addTo(map)
+                            .bindPopup('Tidak ada stasiun pengisian ditemukan.');
+                    }
+
+                    window.addEventListener('resize', () => {
+                        map.invalidateSize();
+                    });
+                } catch (error) {
+                    console.error("Error saat inisialisasi peta:", error);
+                }
             });
         </script>
     @endpush

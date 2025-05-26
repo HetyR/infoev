@@ -13,14 +13,14 @@ class BlogController extends Controller
     public function index()
     {
         return view('backend.blog.index', [
-            'posts' => Blog::with(['thumbnail', 'sticky', 'tipsAndTrick'])->latest()->get()
+            'posts' => Blog::with(['thumbnail', 'sticky', 'tipsAndTrick'])->latest()->paginate(10)
         ]);
     }
-  public function storeTipsAndTrick(Blog $blog, Request $request)
+    public function storeTipsAndTrick(Blog $blog, Request $request)
     {
         // Validasi jika diperlukan
         $request->validate([
-            'content' => 'required|string', 
+            'content' => 'required|string',
         ]);
 
         if (!$blog->tipsAndTrick) {
@@ -47,12 +47,21 @@ class BlogController extends Controller
 
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'summary' => 'required|string|max:500',
+            'content' => 'required|string',
+            'status' => 'required|boolean',
+            'featured' => 'nullable',
+            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048'
+        ]);
+
         $formFields = [
-            'title' => $request->title,
-            'summary' => $request->summary,
-            'content' => $request->content,
-            'published' => $request->status,
-            'featured' => $request->featured == 'on' ?? 0
+            'title' => $validated['title'],
+            'summary' => $validated['summary'],
+            'content' => $validated['content'],
+            'published' => $validated['status'],
+            'featured' => $request->has('featured') ? 1 : 0
         ];
 
         $blog = Blog::create($formFields);
@@ -65,6 +74,7 @@ class BlogController extends Controller
 
         return redirect()->route('backend.blog.index');
     }
+
 
     public function edit(Blog $blog)
     {

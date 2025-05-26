@@ -7,16 +7,30 @@
                 </div>
                 <div class="card-body">
 
+                    {{-- Flash Message (optional) --}}
+                    @if (session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
                     <form method="POST" action="{{ route('backend.brand.store') }}" enctype="multipart/form-data">
                         @csrf
                         
                         <div class="mb-3">
                             <label for="name" class="form-label">Brand</label>
-                            <input type="text" class="form-control" id="name" name="name">
+                            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}">
+                            @error('name')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
+
                         <div class="mb-3">
                             <label for="banner" class="form-label">Banner</label>
-                            <input type="file" class="form-control" id="banner" name="banner" accept="image/*">
+                            <input type="file" class="form-control @error('banner') is-invalid @enderror" id="banner" name="banner" accept="image/*">
+                            @error('banner')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
 
                         <div class="d-flex justify-content-start gap-2 mt-4">

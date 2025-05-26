@@ -192,21 +192,27 @@
                             if (veh2?.pivot?.value_desc) val2 += ` (${veh2.pivot.value_desc})`;
                             break;
 
-case 'unit':
-    if (spec.name.toLowerCase().includes('tahun')) {
-        const val1Num = veh1?.pivot?.value ? Math.round(veh1.pivot.value) : null;
-        const val2Num = veh2?.pivot?.value ? Math.round(veh2.pivot.value) : null;
+                        case 'unit':
+                            if (spec.name.toLowerCase().includes('tahun')) {
+                                const val1Num = veh1?.pivot?.value ? Math.round(veh1.pivot
+                                    .value) : null;
+                                const val2Num = veh2?.pivot?.value ? Math.round(veh2.pivot
+                                    .value) : null;
 
-        val1 = val1Num !== null ? `${val1Num} ${spec.unit || ''}` : '-';
-        val2 = val2Num !== null ? `${val2Num} ${spec.unit || ''}` : '-';
-    } else {
-        val1 = veh1?.pivot?.value ? `${formatNumber(veh1.pivot.value)} ${spec.unit || ''}` : '-';
-        val2 = veh2?.pivot?.value ? `${formatNumber(veh2.pivot.value)} ${spec.unit || ''}` : '-';
-    }
+                                val1 = val1Num !== null ? `${val1Num} ${spec.unit || ''}` : '-';
+                                val2 = val2Num !== null ? `${val2Num} ${spec.unit || ''}` : '-';
+                            } else {
+                                val1 = veh1?.pivot?.value ?
+                                    `${formatNumber(veh1.pivot.value)} ${spec.unit || ''}` :
+                                    '-';
+                                val2 = veh2?.pivot?.value ?
+                                    `${formatNumber(veh2.pivot.value)} ${spec.unit || ''}` :
+                                    '-';
+                            }
 
-    if (veh1?.pivot?.value_desc) val1 += ` (${veh1.pivot.value_desc})`;
-    if (veh2?.pivot?.value_desc) val2 += ` (${veh2.pivot.value_desc})`;
-    break;
+                            if (veh1?.pivot?.value_desc) val1 += ` (${veh1.pivot.value_desc})`;
+                            if (veh2?.pivot?.value_desc) val2 += ` (${veh2.pivot.value_desc})`;
+                            break;
 
 
                         case 'list':
