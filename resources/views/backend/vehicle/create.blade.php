@@ -10,39 +10,66 @@
                         @csrf
                         <div class="mb-3">
                             <label for="type" class="form-label d-block">Type</label>
-                            <select class="form-select" name="type" id="type">
+                            <select class="form-select @error('type') is-invalid @enderror" name="type"
+                                id="type">
                                 <option value="" disabled selected hidden>Select type</option>
                                 @foreach ($types as $type)
-                                    <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                    <option value="{{ $type->id }}"
+                                        {{ old('type') == $type->id ? 'selected' : '' }}>
+                                        {{ $type->name }}
+                                    </option>
                                 @endforeach
                             </select>
+                            @error('type')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
+
                         <div class="mb-3">
                             <label for="brand" class="form-label d-block">Brand</label>
-                            <select class="form-select" name="brand" id="brand">
+                            <select class="form-select @error('brand') is-invalid @enderror" name="brand"
+                                id="brand">
                                 <option value="" disabled selected hidden>Select brand</option>
                                 @foreach ($brands as $brand)
-                                    <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                                    <option value="{{ $brand->id }}"
+                                        {{ old('brand') == $brand->id ? 'selected' : '' }}>
+                                        {{ $brand->name }}
+                                    </option>
                                 @endforeach
                             </select>
+                            @error('brand')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
+
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" name="name">
+                            <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                id="name" name="name" value="{{ old('name') }}">
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
+
                         <div class="mb-3">
                             <label for="pictures" class="form-label">Pictures</label>
-                            <input type="file" class="form-control" id="pictures" name="pictures[]" accept="image/png, image/jpeg" multiple>
+                            <input type="file" class="form-control @error('pictures') is-invalid @enderror"
+                                id="pictures" name="pictures[]" accept="image/png, image/jpeg" multiple>
+                            @error('pictures')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                         </div>
+
                         <div class="mb-3" data-specification>
                             <label class="form-label">Specification</label>
                         </div>
-                        
+
                         <div class="d-flex justify-content-start gap-2 mt-4">
                             <button type="submit" class="btn btn-sm btn-outline-primary hover-shadow">
                                 <i class="fas fa-save me-1"></i> Submit
                             </button>
-                            <a href="{{ route('backend.vehicle.index') }}" class="btn btn-sm btn-outline-secondary hover-shadow">
+                            <a href="{{ route('backend.vehicle.index') }}"
+                                class="btn btn-sm btn-outline-secondary hover-shadow">
                                 <i class="fas fa-arrow-left me-1"></i> Back
                             </a>
                         </div>
@@ -60,7 +87,9 @@
                     <option value="" disabled selected hidden>Select specification</option>
                     @foreach ($specs as $index => $cat)
                         @foreach ($cat->specs as $spec)
-                            <option value="{{ $spec->id }}" data-cat="{{ $index }}" data-index="{{ $loop->index }}" data-type="{{ $spec->type }}">{{ $cat->name }} - {{ $spec->name }}</option>
+                            <option value="{{ $spec->id }}" data-cat="{{ $index }}"
+                                data-index="{{ $loop->index }}" data-type="{{ $spec->type }}">{{ $cat->name }}
+                                - {{ $spec->name }}</option>
                         @endforeach
                     @endforeach
                 </select>
@@ -73,7 +102,8 @@
 
     <x-slot:css>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
     </x-slot>
     <x-slot:js>
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script>
@@ -91,7 +121,8 @@
                 let option = '<option value="" disabled selected hidden>Select specification</option>';
 
                 for (const [idx, sp] of spec.specs.entries()) {
-                    option = `${option}<option value="${sp.id}" data-cat="${index}" data-index="${idx}" data-type="${sp.type}">${sp.name}</option>`;
+                    option =
+                        `${option}<option value="${sp.id}" data-cat="${index}" data-index="${idx}" data-type="${sp.type}">${sp.name}</option>`;
                 }
                 specElem.innerHTML = option;
                 specElem.disabled = false;
@@ -103,7 +134,8 @@
                 const selectContainer = parentContainer.firstElementChild;
                 let specContainer = parentContainer.querySelector('[data-spec-container]');
                 if (specContainer === null) {
-                    selectContainer.insertAdjacentHTML('afterend', '<div class="col-sm-6 row m-0 p-0" data-spec-container></div>');
+                    selectContainer.insertAdjacentHTML('afterend',
+                        '<div class="col-sm-6 row m-0 p-0" data-spec-container></div>');
                     specContainer = parentContainer.querySelector('[data-spec-container]');
                 }
                 selectContainer.className = 'col-sm-4';
@@ -112,7 +144,8 @@
                 const catIndex = e.selectedOptions[0].dataset.cat;
                 const specIndex = e.selectedOptions[0].dataset.index;
 
-                let content = '<div class="col"><input type="text" class="form-control" name="value_descriptions[]" placeholder="Description"></div>';
+                let content =
+                    '<div class="col"><input type="text" class="form-control" name="value_descriptions[]" placeholder="Description"></div>';
                 switch (type) {
                     case 'price':
                         content = `<div class="col">
@@ -152,7 +185,8 @@
                         </div>${content}`;
                         break;
                     case 'description':
-                        content = `<div class="col"><input type="hidden" name="value_types[]" value="${type}"><input type="hidden" name="values[]"><input type="text" class="form-control" name="value_descriptions[]" placeholder="Description"></div>`;
+                        content =
+                            `<div class="col"><input type="hidden" name="value_types[]" value="${type}"><input type="hidden" name="values[]"><input type="text" class="form-control" name="value_descriptions[]" placeholder="Description"></div>`;
                         break;
                     case 'availability':
                         content = `<div class="col d-flex align-items-center">
@@ -196,7 +230,7 @@
                     e.nextSibling.textContent = 'Tersedia';
                 } else {
                     e.parentElement.firstElementChild.value = 'false';
-                    e.nextSibling.textContent =  'Tidak tersedia';
+                    e.nextSibling.textContent = 'Tidak tersedia';
                 }
             }
 
@@ -208,7 +242,8 @@
 
                         if (i === 1) {
                             const firstContainer = document.querySelector('[data-parent]');
-                            firstContainer.lastElementChild.innerHTML = '<button type="button" class="btn btn-outline-success" onclick="addSpec()">Add</button>';
+                            firstContainer.lastElementChild.innerHTML =
+                                '<button type="button" class="btn btn-outline-success" onclick="addSpec()">Add</button>';
                             firstContainer.classList.remove('mt-4');
                         }
 

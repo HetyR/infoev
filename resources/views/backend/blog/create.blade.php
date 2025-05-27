@@ -6,39 +6,64 @@
                     Add New Blog
                 </div>
                 <div class="card-body">
+
                     <form method="POST" action="{{ route('backend.blog.store') }}" enctype="multipart/form-data">
                         @csrf
+
                         <div class="mb-3">
                             <label for="title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="title" name="title">
+                            <input type="text" class="form-control @error('title') is-invalid @enderror"
+                                id="title" name="title" value="{{ old('title') }}">
+                            @error('title')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="mb-3">
                             <label for="summary" class="form-label">Summary</label>
-                            <textarea class="form-control" id="summary" name="summary"></textarea>
+                            <textarea class="form-control @error('summary') is-invalid @enderror" id="summary" name="summary">{{ old('summary') }}</textarea>
+                            @error('summary')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="mb-3">
                             <label for="content" class="form-label d-block">Content</label>
-                            <button type="button" class="btn btn-outline-primary btn-sm mb-3" onclick="changeEditor(this)">Edit HTML</button>
-                            <textarea class="form-control" id="content" name="content"></textarea>
+                            <button type="button" class="btn btn-outline-primary btn-sm mb-3"
+                                onclick="changeEditor(this)">Edit HTML</button>
+                            <textarea class="form-control @error('content') is-invalid @enderror" id="content" name="content">{{ old('content') }}</textarea>
+                            @error('content')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="mb-3">
                             <label for="status" class="form-label d-block">Status</label>
-                            <select class="form-select" name="status" id="status">
-                                <option value="1" selected>Published</option>
-                                <option value="0">Documentation</option>
+                            <select class="form-select @error('status') is-invalid @enderror" name="status"
+                                id="status">
+                                <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Published</option>
+                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Documentation
+                                </option>
                             </select>
+                            @error('status')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="mb-3">
                             <label for="thumbnail" class="form-label">Thumbnail</label>
-                            <input type="file" class="form-control" id="thumbnail" name="thumbnail" accept="image/png, image/jpeg">
+                            <input type="file" class="form-control @error('thumbnail') is-invalid @enderror"
+                                id="thumbnail" name="thumbnail" accept="image/png, image/jpeg">
+                            <small class="text-muted">Max file size: 2 MB. Only JPG.</small>
+                            @error('thumbnail')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
+
                         <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="featured" name="featured">
+                            <input type="checkbox" class="form-check-input" id="featured" name="featured"
+                                {{ old('featured') ? 'checked' : '' }}>
                             <label class="form-check-label" for="featured">Featured News</label>
                         </div>
 
@@ -46,7 +71,8 @@
                             <button type="submit" class="btn btn-sm btn-outline-primary hover-shadow">
                                 <i class="fas fa-save me-1"></i> Submit
                             </button>
-                            <a href="{{ route('backend.blog.index') }}" class="btn btn-sm btn-outline-secondary hover-shadow">
+                            <a href="{{ route('backend.blog.index') }}"
+                                class="btn btn-sm btn-outline-secondary hover-shadow">
                                 <i class="fas fa-arrow-left me-1"></i> Back
                             </a>
                         </div>
@@ -58,7 +84,8 @@
 
     <x-slot:css>
         <style>
-            .ck-editor__editable_inline, #content {
+            .ck-editor__editable_inline,
+            #content {
                 min-height: 300px !important;
             }
 

@@ -16,9 +16,7 @@ class BlogController extends Controller
     public function index()
     {
         return view('backend.blog.index', [
-            'posts' => Blog::with(['thumbnail', 'sticky', 'tipsAndTrick'])
-                ->latest()
-                ->get(),
+            'posts' => Blog::with(['thumbnail', 'sticky', 'tipsAndTrick'])->latest()->paginate(10)
         ]);
     }
     public function storeTipsAndTrick(Blog $blog, Request $request)
@@ -52,12 +50,21 @@ class BlogController extends Controller
 
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'summary' => 'required|string|max:500',
+            'content' => 'required|string',
+            'status' => 'required|boolean',
+            'featured' => 'nullable',
+            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048'
+        ]);
+
         $formFields = [
-            'title' => $request->title,
-            'summary' => $request->summary,
-            'content' => $request->content,
-            'published' => $request->status,
-            'featured' => $request->featured == 'on' ?? 0,
+            'title' => $validated['title'],
+            'summary' => $validated['summary'],
+            'content' => $validated['content'],
+            'published' => $validated['status'],
+            'featured' => $request->has('featured') ? 1 : 0
         ];
 
         $blog = Blog::create($formFields);
@@ -74,31 +81,6 @@ class BlogController extends Controller
         return redirect()->route('backend.blog.index');
     }
 
-    private function sendNotification($blog)
-    {
-        $credentialsPath = storage_path('app/firebase_credentials.json');
-
-        // Buat instance Firebase dengan service account manual
-        $factory = (new Factory())->withServiceAccount($credentialsPath);
-
-        $messaging = $factory->createMessaging();
-
-        $imageUrl = null;
-
-        if ($blog->thumbnail && $blog->thumbnail->path) {
-            $imageUrl = asset('storage/' . $blog->thumbnail->path);
-        }
-
-        $notification = Notification::create($blog->title, $blog->summary);
-
-        if ($imageUrl) {
-            $notification = $notification->withImage($imageUrl);
-        }
-
-        $message = CloudMessage::new()->withTarget('topic', 'berita')->withNotification($notification);
-
-        $messaging->send($message);
-    }
 
     public function edit(Blog $blog)
     {

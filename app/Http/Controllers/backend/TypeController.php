@@ -11,40 +11,52 @@ use function PHPUnit\Framework\isNull;
 
 class TypeController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         return view('backend.type.index', [
             'types' => Type::orderBy('name')->get()
         ]);
     }
 
-    public function create() {
+    public function create()
+    {
         return view('backend.type.create');
     }
 
-    public function store(Request $request) {
-        $formFields = [
-            'name' => $request->name
-        ];
+    public function store(Request $request)
+    {
+        // Validasi input
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'banner' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
 
-        $type = Type::create($formFields);
+        // Simpan tipe baru
+        $type = Type::create([
+            'name' => $validated['name'],
+        ]);
 
+        // Simpan banner jika ada
         if ($request->hasFile('banner')) {
             $type->thumbnail()->create([
-                'path' => $request->file('banner')->store('banner', 'public')
+                'path' => $request->file('banner')->store('banner', 'public'),
             ]);
         }
 
-        return redirect()->route('backend.type.index');
+        return redirect()->route('backend.type.index')->with('success', 'Type created successfully!');
     }
 
-    public function edit(Type $type) {
+
+    public function edit(Type $type)
+    {
         return view('backend.type.edit', [
             'type' => $type,
             'banner' => $type->thumbnail
         ]);
     }
 
-    public function update(Request $request, Type $type) {
+    public function update(Request $request, Type $type)
+    {
         $formFields = [
             'name' => $request->name
         ];
@@ -66,7 +78,8 @@ class TypeController extends Controller
         return redirect()->route('backend.type.index');
     }
 
-    public function destroy(Type $type) {
+    public function destroy(Type $type)
+    {
         $banner = $type->thumbnail;
         if (!is_null($banner)) {
             Storage::delete('public/' . $banner->path);

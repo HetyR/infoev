@@ -16,60 +16,80 @@ use Illuminate\Support\Facades\Storage;
 
 class VehicleController extends Controller
 {
-public function index(Request $request)
-{
-    $typeId = $request->input('type_id');
-    $brandId = $request->input('brand_id');
-    $marketplaceId = $request->input('marketplace_id');
+    public function index(Request $request)
+    {
+        $typeId = $request->input('type_id');
+        $brandId = $request->input('brand_id');
+        $marketplaceId = $request->input('marketplace_id');
 
-    // Query kendaraan
-    $query = Vehicle::query();
+        // Query kendaraan
+        $query = Vehicle::query();
 
-    if ($typeId) {
-        $query->where('type_id', $typeId);
-    }
-
-    if ($brandId) {
-        $query->where('brand_id', $brandId);
-    }
-
-    if ($marketplaceId === 'none') {
-        $query->whereDoesntHave('affiliate');
-    } elseif ($marketplaceId) {
-        $query->whereHas('affiliate', function ($q) use ($marketplaceId) {
-            $q->where('marketplace_id', $marketplaceId);
-        });
-    }
-
-    $vehicles = $query->get();
-
-    $filteredBrands = Brand::whereHas('vehicles', function ($query) use ($typeId) {
         if ($typeId) {
             $query->where('type_id', $typeId);
         }
-    })->get();
 
-    return view('backend.vehicle.index', [
-        'vehicles' => $vehicles,
-        'types' => Type::all(),
-        'brands' => $filteredBrands, 
-        'marketplaces' => Marketplace::all(),
-    ]);
-}
+        if ($brandId) {
+            $query->where('brand_id', $brandId);
+        }
+
+        if ($marketplaceId === 'none') {
+            $query->whereDoesntHave('affiliate');
+        } elseif ($marketplaceId) {
+            $query->whereHas('affiliate', function ($q) use ($marketplaceId) {
+                $q->where('marketplace_id', $marketplaceId);
+            });
+        }
+
+        $vehicles = $query->get();
+
+        $filteredBrands = Brand::whereHas('vehicles', function ($query) use ($typeId) {
+            if ($typeId) {
+                $query->where('type_id', $typeId);
+            }
+        })->get();
+
+        return view('backend.vehicle.index', [
+            'vehicles' => $vehicles,
+            'types' => Type::all(),
+            'brands' => $filteredBrands,
+            'marketplaces' => Marketplace::all(),
+        ]);
+    }
 
 
-    public function create() {
+    public function create()
+    {
         return view('backend.vehicle.create', [
             'types' => Type::orderBy('name')->get(),
             'brands' => Brand::orderBy('name')->get(),
             'specs' => SpecCategory::with('specs', 'specs.lists')
-                        ->orderBy('priority')
-                        ->get()
+                ->orderBy('priority')
+                ->get()
         ]);
     }
 
-    public function store(Request $request) {
-        // dd($request->all());
+    public function store(Request $request)
+    {
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'type' => 'required|exists:types,id',
+            'brand' => 'required|exists:brands,id',
+
+            'spec_ids' => 'required|array',
+            'spec_ids.*' => 'required|exists:specs,id',
+
+            'value_types' => 'required|array',
+            'value_types.*' => 'required|string|in:price,unit,description,list,availability',
+
+            'values' => 'required|array',
+            'values.*' => 'nullable|string',
+
+            'value_descriptions' => 'nullable|array',
+            'value_descriptions.*' => 'nullable|string',
+        ]);
+        
         $typeId = $request->type;
         $brandId = $request->brand;
 
@@ -185,13 +205,14 @@ public function index(Request $request)
         return redirect()->route('backend.vehicle.index');
     }
 
-    public function edit(Vehicle $vehicle) {
+    public function edit(Vehicle $vehicle)
+    {
         return view('backend.vehicle.edit', [
             'types' => Type::orderBy('name')->get(),
             'brands' => Brand::orderBy('name')->get(),
             'specs' => SpecCategory::with('specs', 'specs.lists')
-                        ->orderBy('name')
-                        ->get(),
+                ->orderBy('name')
+                ->get(),
             // 'hiddenSpecs' => Spec::with(['vehicles' => function ($query) use ($vehicle) {
             //                     $query->where('vehicles.id', $vehicle->id);
             //                 }])
@@ -201,7 +222,8 @@ public function index(Request $request)
         ]);
     }
 
-    public function update(Request $request, Vehicle $vehicle) {
+    public function update(Request $request, Vehicle $vehicle)
+    {
         $typeId = $request->type;
         $brandId = $request->brand;
 
@@ -224,7 +246,8 @@ public function index(Request $request)
         $pivotLists = [];
         if (($specValues == null) ||
             (count($specValues) == 1 &&
-                ($specValues[0] == null && $specDescriptions[0] == null))) {
+                ($specValues[0] == null && $specDescriptions[0] == null))
+        ) {
             $vehicle->specs()->detach();
         } else {
             for ($i = 0; $i < count($specValues); $i++) {
@@ -322,7 +345,8 @@ public function index(Request $request)
         return redirect()->route('backend.vehicle.index');
     }
 
-    public function destroy(Vehicle $vehicle) {
+    public function destroy(Vehicle $vehicle)
+    {
         $pictures = $vehicle->pictures;
         if ($pictures->count() > 0) {
             foreach ($pictures as $pic) {

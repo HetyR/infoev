@@ -8,18 +8,43 @@
                 <div class="card-body">
                     <form method="POST" action="{{ route('backend.spec.category.store') }}">
                         @csrf
+
+                        {{-- Name --}}
                         <div class="mb-3">
                             <label for="name" class="form-label">Category Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <input
+                                type="text"
+                                class="form-control @error('name') is-invalid @enderror"
+                                id="name"
+                                name="name"
+                                value="{{ old('name') }}"
+                                required
+                            >
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
+
+                        {{-- Priority --}}
                         <div class="mb-3">
                             <label for="priority" class="form-label d-block">Priority</label>
-                            <select class="form-select" name="priority" id="priority">
+                            <select
+                                class="form-select @error('priority') is-invalid @enderror"
+                                name="priority"
+                                id="priority"
+                            >
                                 @for ($i = 0; $i < 9; $i++)
-                                    <option value="{{ $i + 1 }}" @if ($i === 8) selected @endif>{{ $i + 1 }}</option>
+                                    <option value="{{ $i + 1 }}" @selected(old('priority', 9) == $i + 1)>
+                                        {{ $i + 1 }}
+                                    </option>
                                 @endfor
                             </select>
+                            @error('priority')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
+
+                        {{-- Buttons --}}
                         <div class="d-flex justify-content-start gap-2 mt-4">
                             <button type="submit" class="btn btn-sm btn-outline-primary hover-shadow">
                                 <i class="fas fa-save me-1"></i> Submit

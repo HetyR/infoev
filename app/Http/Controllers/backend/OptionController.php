@@ -6,6 +6,7 @@ use App\Models\Type;
 use App\Models\Brand;
 use App\Models\Blog;
 use App\Models\StickyArticle;
+use App\Models\TipsAndTrick;
 use App\Models\Spec;
 use App\Models\Vehicle;
 use App\Models\Marketplace;
@@ -94,11 +95,12 @@ class OptionController extends Controller
         $totalVehicles = Vehicle::count();
         $totalMarketplaces = Marketplace::count();
         $totalComments = Comment::count();
+        $totalTipsAndTrick = TipsAndTrick::count();
 
         // Mengirimkan data ke view dashboard
         return view('backend.option.dashboard', compact(
             'totalTypes', 'totalBrands', 'totalBlogs', 'totalStickyArticles', 
-            'totalSpecs', 'totalVehicles', 'totalMarketplaces', 'totalComments'
+            'totalSpecs', 'totalVehicles', 'totalMarketplaces', 'totalComments', 'totalTipsAndTrick'
         ));
     }
 }
