@@ -10,9 +10,36 @@ use Illuminate\Http\Request;
 
 class AffiliateController extends Controller
 {
-    public function show(Vehicle $vehicle) {
-        return view('backend.affiliate.show', [
-            'vehicle' => $vehicle
+    // public function show(Vehicle $vehicle) {
+    //     return view('backend.affiliate.show', [
+    //         'vehicle' => $vehicle
+    //     ]);
+    // }
+
+    public function show(Vehicle $vehicle)
+    {
+        $affiliateLinks = AffiliateLink::with('marketplace')
+            ->where('vehicle_id', $vehicle->id)
+            ->get();
+
+        return response()->json([
+            'vehicle' => [
+                'id' => $vehicle->id,
+                'slug' => $vehicle->slug,
+                'name' => $vehicle->name,
+            ],
+            'affiliates' => $affiliateLinks->map(function ($link) {
+                return [
+                    'id' => $link->id,
+                    'desc' => $link->desc,
+                    'price' => $link->price,
+                    'link' => $link->link,
+                    'marketplace' => [
+                        'id' => $link->marketplace->id,
+                        'name' => $link->marketplace->name,
+                    ]
+                ];
+            })
         ]);
     }
 
@@ -23,27 +50,51 @@ class AffiliateController extends Controller
         ]);
     }
 
-    public function store(Request $request, Vehicle $vehicle) {
-        $marketplace = Marketplace::find($request->marketplace);
+    // public function store(Request $request, Vehicle $vehicle) {
+    //     $marketplace = Marketplace::find($request->marketplace);
 
-        $affiliate = new AffiliateLink;
-        $affiliate->desc = $request->desc;
-        $affiliate->price = $request->price;
-        $affiliate->link = $request->link;
+    //     $affiliate = new AffiliateLink;
+    //     $affiliate->desc = $request->desc;
+    //     $affiliate->price = $request->price;
+    //     $affiliate->link = $request->link;
 
-        $affiliate->vehicle()->associate($vehicle);
-        $affiliate->marketplace()->associate($marketplace);
+    //     $affiliate->vehicle()->associate($vehicle);
+    //     $affiliate->marketplace()->associate($marketplace);
+    //     $affiliate->save();
+
+    //     return redirect()->route('backend.affiliate.show', ['vehicle' => $vehicle->slug]);
+    // }
+
+    // public function edit(AffiliateLink $affiliate, Vehicle $vehicle) {
+    //     return view('backend.affiliate.edit', [
+    //         'vehicle' => $vehicle,
+    //         'marketplaces' => Marketplace::orderBy('name')->get(),
+    //         'affiliate' => $affiliate
+    //     ]);
+    // }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'vehicle_id' => 'required|exists:vehicles,id',
+            'marketplace_id' => 'required|exists:marketplaces,id',
+            'desc' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'link' => 'required|url'
+        ]);
+
+        $affiliate = new AffiliateLink();
+        $affiliate->desc = $validated['desc'];
+        $affiliate->price = $validated['price'];
+        $affiliate->link = $validated['link'];
+        $affiliate->vehicle_id = $validated['vehicle_id'];
+        $affiliate->marketplace_id = $validated['marketplace_id'];
         $affiliate->save();
 
-        return redirect()->route('backend.affiliate.show', ['vehicle' => $vehicle->slug]);
-    }
-
-    public function edit(AffiliateLink $affiliate, Vehicle $vehicle) {
-        return view('backend.affiliate.edit', [
-            'vehicle' => $vehicle,
-            'marketplaces' => Marketplace::orderBy('name')->get(),
-            'affiliate' => $affiliate
-        ]);
+        return response()->json([
+            'message' => 'Affiliate link created successfully',
+            'data' => $affiliate
+        ], 201);
     }
 
     public function update(Request $request, AffiliateLink $affiliate) {

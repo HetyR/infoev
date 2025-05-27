@@ -19,6 +19,7 @@ public/hot
 public_html/storage
 public_html/hot
 
+storage/app/*.json
 storage/*.key
 .env
 .env.backup

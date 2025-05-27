@@ -19,6 +19,9 @@ use App\Http\Controllers\Api\SpecTestController;
 use App\Http\Controllers\Api\FavoriteController;
 
 
+use App\Http\Controllers\backend\AffiliateController;
+
+
 
 //Update Route Keranjang Loved Vehicle
 Route::middleware('auth:sanctum')->group(function () {
@@ -70,6 +73,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     // Find City
     Route::get('/cities', [ChargerStationController::class, 'getCities']); 
     Route::get('/cities/search', [ChargerStationController::class, 'searchCities']);
+
+
+
+    //Route Kebutuhan Alfaro
+    Route::get('/vehicles/{vehicle}/affiliate', [AffiliateController::class, 'show']);
+    Route::post('/vehicles/{vehicle}/affiliate', [AffiliateController::class, 'store']);
 
 
 

@@ -7,24 +7,29 @@ use App\Models\Blog;
 use App\Models\TipsAndTrick;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
+use Kreait\Laravel\Firebase\Facades\Firebase;
 
 class BlogController extends Controller
 {
     public function index()
     {
         return view('backend.blog.index', [
-            'posts' => Blog::with(['thumbnail', 'sticky', 'tipsAndTrick'])->latest()->get()
+            'posts' => Blog::with(['thumbnail', 'sticky', 'tipsAndTrick'])
+                ->latest()
+                ->get(),
         ]);
     }
-  public function storeTipsAndTrick(Blog $blog, Request $request)
+    public function storeTipsAndTrick(Blog $blog, Request $request)
     {
         // Validasi jika diperlukan
         $request->validate([
-            'content' => 'required|string', 
+            'content' => 'required|string',
         ]);
 
         if (!$blog->tipsAndTrick) {
-            $tipsAndTrick = new TipsAndTrick;
+            $tipsAndTrick = new TipsAndTrick();
             $tipsAndTrick->blog()->associate($blog);
             $tipsAndTrick->content = $request->input('content');
             $tipsAndTrick->save();
@@ -52,25 +57,54 @@ class BlogController extends Controller
             'summary' => $request->summary,
             'content' => $request->content,
             'published' => $request->status,
-            'featured' => $request->featured == 'on' ?? 0
+            'featured' => $request->featured == 'on' ?? 0,
         ];
 
         $blog = Blog::create($formFields);
 
         if ($request->hasFile('thumbnail')) {
             $blog->thumbnail()->create([
-                'path' => $request->file('thumbnail')->store('blog', 'public')
+                'path' => $request->file('thumbnail')->store('blog', 'public'),
             ]);
         }
 
+        // Kirim notifikasi setelah berhasil simpan
+        $this->sendNotification($blog);
+
         return redirect()->route('backend.blog.index');
+    }
+
+    private function sendNotification($blog)
+    {
+        $credentialsPath = storage_path('app/firebase_credentials.json');
+
+        // Buat instance Firebase dengan service account manual
+        $factory = (new Factory())->withServiceAccount($credentialsPath);
+
+        $messaging = $factory->createMessaging();
+
+        $imageUrl = null;
+
+        if ($blog->thumbnail && $blog->thumbnail->path) {
+            $imageUrl = asset('storage/' . $blog->thumbnail->path);
+        }
+
+        $notification = Notification::create($blog->title, $blog->summary);
+
+        if ($imageUrl) {
+            $notification = $notification->withImage($imageUrl);
+        }
+
+        $message = CloudMessage::new()->withTarget('topic', 'berita')->withNotification($notification);
+
+        $messaging->send($message);
     }
 
     public function edit(Blog $blog)
     {
         return view('backend.blog.edit', [
             'post' => $blog,
-            'thumbnail' => $blog->thumbnail
+            'thumbnail' => $blog->thumbnail,
         ]);
     }
 
@@ -83,7 +117,7 @@ class BlogController extends Controller
             'summary' => $request->summary,
             'content' => $request->content,
             'published' => $request->status,
-            'featured' => $request->featured == 'on' ?? 0
+            'featured' => $request->featured == 'on' ?? 0,
         ];
 
         $blog->update($formFields);
@@ -96,7 +130,7 @@ class BlogController extends Controller
             }
 
             $blog->thumbnail()->create([
-                'path' => $request->file('thumbnail')->store('blog', 'public')
+                'path' => $request->file('thumbnail')->store('blog', 'public'),
             ]);
         }
 
