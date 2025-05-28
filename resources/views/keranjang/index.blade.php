@@ -43,25 +43,17 @@
             </div>
 
             <!-- Vehicle Cards Grid -->
-            @if(count($informasiKendaraan) > 0)
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            @if ($informasiKendaraan && count($informasiKendaraan) > 0)
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     @foreach ($informasiKendaraan as $kendaraan)
                         <div class="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-gray-200">
                             <!-- Vehicle Image Container -->
-                                 <div class="relative bg-gray-100 aspect-square min-h-[200px] overflow-hidden">
-                                <a href="{{ route('vehicle.show', ['vehicle' => $kendaraan['slug']]) }}" class="block h-full">
-                                    <img src="{{ $kendaraan['gambar'] }}"
-                                         class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                                         alt="{{ ($kendaraan['merek'] ?? 'Unknown Brand') . ' ' . ($kendaraan['nama'] ?? 'Unknown Model') }}"
-                                         loading="lazy"
-                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                    
-                                    <!-- Hover Overlay -->
-                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 rounded-xl flex items-center justify-center">
-                                        <div class="bg-white bg-opacity-90 backdrop-blur-sm px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
-                                            <span class="text-sm font-semibold text-gray-800">View Details</span>
-                                        </div>
-                                    </div>
+                            <div class="relative aspect-square p-6 bg-gradient-to-br from-gray-50 to-gray-100">
+                                <a href="{{ route('vehicle.show', ['vehicle' => $kendaraan['slug']]) }}" class="block">
+                                    <img src="{{ $kendaraan['gambar'] }}" 
+                                         class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-500" 
+                                         alt="{{ $kendaraan['merek'] }} {{ $kendaraan['nama'] }}">
+                                
                                 </a>
                             </div>
 
