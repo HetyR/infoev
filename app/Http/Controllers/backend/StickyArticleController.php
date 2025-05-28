@@ -9,13 +9,24 @@ use Illuminate\Http\Request;
 
 class StickyArticleController extends Controller
 {
-    public function index() {
-        return view('backend.sticky_article.index', [
-            'stickies' => StickyArticle::with('blog.thumbnail')
-                        ->latest()
-                        ->get()
-        ]);
+public function index() {
+    $stickies = StickyArticle::with('blog.thumbnail')->latest()->get();
+
+    // Debug
+    foreach ($stickies as $sticky) {
+        logger('sticky id: ' . $sticky->id);
+        logger('blog id: ' . ($sticky->blog?->id ?? 'NULL'));
+        logger('blog title: ' . ($sticky->blog?->title ?? 'NULL'));
+        logger('thumbnail path: ' . ($sticky->blog?->thumbnail?->path ?? 'NULL'));
     }
+
+    return view('backend.sticky_article.index', [
+        'stickies' => $stickies
+    ]);
+}
+
+
+
 
     public function store(Blog $blog) {
         $stickyArticle = new StickyArticle;

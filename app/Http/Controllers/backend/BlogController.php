@@ -75,9 +75,6 @@ class BlogController extends Controller
             ]);
         }
 
-        // Kirim notifikasi setelah berhasil simpan
-        $this->sendNotification($blog);
-
         return redirect()->route('backend.blog.index');
     }
 
