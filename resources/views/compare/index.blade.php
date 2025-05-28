@@ -138,9 +138,9 @@
 
                 if (!hasVehicleSpecs) return;
 
-                html += `<div class="mt-8">`;
-                html += `<h2 class="text-lg font-semibold text-gray-800 uppercase border-l-8 border-purple-900 pl-4 py-2 mb-1">${cat.name}</h2>`;
-                html += `<table class="w-full text-sm text-left border border-gray-200 rounded-lg">`;
+                html += `<div class="mt-8 bg-white rounded-lg shadow-sm">`;
+                html += `<h2 class="w-full text-lg font-semibold text-gray-800 uppercase border-l-8 border-purple-900 bg-gray-200 pl-4 py-2 mb-0 rounded-t-lg">${cat.name}</h2>`;
+                html += `<table class="w-full text-sm text-left border-0">`;
 
                 cat.specs.forEach(spec => {
                     const veh1 = spec.vehicles?.find(v => String(v.id) === String(v1?.id));
