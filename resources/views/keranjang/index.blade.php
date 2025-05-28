@@ -31,7 +31,7 @@
             </div>
 
             @if (count($informasiKendaraan) > 0)
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-4 mb-4">
                     @foreach ($informasiKendaraan as $kendaraan)
                         <div class="relative bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-xl hover:scale-105 transition-all duration-300 ease-out group overflow-hidden p-4">
                             <!-- Vehicle Image -->
