@@ -3,8 +3,7 @@
 
     {{-- Meta tags --}}
     <x-slot:meta>
-        <meta name="description"
-              content="Manage your favorite electric vehicles on InfoEV. Explore and curate your dream EV collection.">
+        <meta name="description" content="Manage your favorite electric vehicles on InfoEV. Explore and curate your dream EV collection.">
         <meta name="keywords" content="electric vehicles, EV favorites, InfoEV, electric cars, electric bikes">
     </x-slot>
 
@@ -73,7 +72,7 @@
                                     </div>
                                     <!-- Remove Button -->
                                     <form action="{{ route('keranjang.remove', ['vehicleId' => $kendaraan['id']]) }}"
-                                          method="POST" class="flex-shrink-0">
+                                          method="POST" class="flex-shrink-zak0">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" title="Remove from favorites"
