@@ -193,7 +193,7 @@
                     }
 
                     isDiff = val1 !== val2 && v1 && v2;
-                    const diffClass = isDiff ? 'text-purple-600 font-medium' : '';
+                    const diffClass = isDiff ? 'font-medium' : '';
 
                     html += `<tr class="border-b border-gray-200 hover:bg-gray-50">
                         <td class="p-3 w-1/3 font-medium bg-gray-100">${spec.name}</td>
