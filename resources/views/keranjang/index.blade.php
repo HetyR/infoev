@@ -28,12 +28,11 @@
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Favorite Vehicles</h1>
                 <p class="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">Temukan dan kelola koleksi kendaraan
                     listrik pilihan Anda</p>
-                
             </div>
 
             @if (count($informasiKendaraan) > 0)
                 <div
-                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-10 mt-6 mb-6">
+                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-12 gap-x-8 mt-6 mb-6">
                     @foreach ($informasiKendaraan as $kendaraan)
                         <div
                             class="relative bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-xl hover:scale-105 transition-all duration-300 ease-out group overflow-hidden">
@@ -86,9 +85,10 @@
                                         <button type="submit" title="Hapus dari favorit"
                                             onclick="return confirm('Hapus kendaraan ini dari favorit?')"
                                             class="flex items-center justify-center w-10 h-10 bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 rounded-full transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor" class="w-5 h-5">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    stroke-width="2"
                                                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
                                         </button>
