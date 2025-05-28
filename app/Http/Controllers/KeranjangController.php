@@ -52,8 +52,7 @@ class KeranjangController extends Controller
                 ->get();
 
             $title = ''; // Set your title here
-            $brand = Brand::findOrFail(1); // Example of fetching a brand, adjust as needed
-
+            $brand = Brand::first();
             $stickies = []; // Placeholder for stickies, adjust as needed
 
             $recentVehicles = Vehicle::with('brand')
@@ -88,7 +87,7 @@ class KeranjangController extends Controller
             return redirect()->route('login');
         }
     }
-    
+
     public function remove($vehicleId)
     {
         $user = auth()->user();
@@ -101,6 +100,4 @@ class KeranjangController extends Controller
             return redirect()->route('login');
         }
     }
-
-    
 }

@@ -59,9 +59,12 @@
 
                 @auth
                     <div class="flex items-center space-x-3">
-                        <a href="{{ route('keranjang.index') }}" class="block px-2 hover:text-grey shadow-inner">
-                            <i class="fas fa-heart text-2xl"></i>
-                        </a>
+                   @auth
+    <a href="{{ route('keranjang.index') }}" class="block px-2 hover:text-grey shadow-inner">
+        <i class="fas fa-heart text-2xl"></i>
+    </a>
+@endauth
+
                         <div class="relative">
                             <button class="flex items-center space-x-2 focus:outline-none" id="user-menu-button">
                                 <span>{{ auth()->user()->name }}</span>

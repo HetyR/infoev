@@ -83,6 +83,7 @@
         "postcss-nested": "^6.0.0",
         "postcss-selector-parser": "^6.0.10",
         "postcss-value-parser": "^4.2.0",
+        "puppeteer-extra-plugin-stealth": "^2.11.2",
         "queue-microtask": "^1.2.3",
         "quick-lru": "^5.1.1",
         "read-cache": "^1.0.0",

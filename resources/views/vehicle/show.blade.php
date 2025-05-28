@@ -90,11 +90,6 @@
                     </div>
                     {{-- End Love Button --}}
 
-
-
-
-
-
                 </div>
             @endif
             {{-- End Specification Detail --}}
