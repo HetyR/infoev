@@ -7,7 +7,6 @@ use App\Jobs\CheckAffiliateLink;
 use App\Mail\InactiveAffiliateLinksReport;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
 
 class CheckAffiliateLinks extends Command
 {
@@ -23,7 +22,7 @@ class CheckAffiliateLinks extends Command
 
         foreach ($allLinks as $link) {
             $this->info("Cek link: {$link->link}");
-            // Dispatch job synchronous agar proses urut dan bisa lihat log di terminal
+            // Jalankan job secara synchronous (langsung handle)
             (new CheckAffiliateLink($link))->handle();
         }
 
@@ -34,7 +33,6 @@ class CheckAffiliateLinks extends Command
         } else {
             $this->info('Ada affiliate link yang tidak aktif, mengirim email laporan...');
 
-            // Kirim email laporan ke admin (ganti email admin sesuai)
             Mail::to('hetyoyi@gmail.com')->send(new InactiveAffiliateLinksReport($inactiveLinks));
 
             $this->info('Email laporan sudah dikirim.');
