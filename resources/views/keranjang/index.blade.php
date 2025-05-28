@@ -31,13 +31,11 @@
             </div>
 
             @if (count($informasiKendaraan) > 0)
-                <div
-                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-12 gap-x-8 mt-6 mb-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     @foreach ($informasiKendaraan as $kendaraan)
-                        <div
-                            class="relative bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-xl hover:scale-105 transition-all duration-300 ease-out group overflow-hidden">
+                        <div class="relative bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-xl hover:scale-105 transition-all duration-300 ease-out group overflow-hidden p-4">
                             <!-- Vehicle Image -->
-                            <div class="relative bg-gray-100 aspect-square min-h-[200px] overflow-hidden">
+                            <div class="relative bg-gray-100 aspect-square min-h-[200px] overflow-hidden mb-4">
                                 <a href="{{ route('vehicle.show', ['vehicle' => $kendaraan['slug']]) }}"
                                     class="block h-full">
                                     <img src="{{ $kendaraan['gambar'] }}"
@@ -69,31 +67,29 @@
                             </div>
 
                             <!-- Vehicle Info -->
-                            <div class="p-6">
-                                <div class="flex items-start justify-between gap-4">
-                                    <div class="flex-1 min-w-0">
-                                        <h3 class="font-bold text-lg text-gray-900 truncate mb-1">
-                                            {{ $kendaraan['merek'] ?? 'Merek Tidak Diketahui' }}</h3>
-                                        <p class="text-gray-600 text-sm truncate">
-                                            {{ $kendaraan['nama'] ?? 'Model Tidak Diketahui' }}</p>
-                                    </div>
-                                    <!-- Remove Button -->
-                                    <form action="{{ route('keranjang.remove', ['vehicleId' => $kendaraan['id']]) }}"
-                                        method="POST" class="flex-shrink-0">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" title="Hapus dari favorit"
-                                            onclick="return confirm('Hapus kendaraan ini dari favorit?')"
-                                            class="flex items-center justify-center w-10 h-10 bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 rounded-full transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
-                                    </form>
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="font-bold text-lg text-gray-900 truncate mb-1">
+                                        {{ $kendaraan['merek'] ?? 'Merek Tidak Diketahui' }}</h3>
+                                    <p class="text-gray-600 text-sm truncate">
+                                        {{ $kendaraan['nama'] ?? 'Model Tidak Diketahui' }}</p>
                                 </div>
+                                <!-- Remove Button -->
+                                <form action="{{ route('keranjang.remove', ['vehicleId' => $kendaraan['id']]) }}"
+                                    method="POST" class="flex-shrink-0">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" title="Hapus dari favorit"
+                                        onclick="return confirm('Hapus kendaraan ini dari favorit?')"
+                                        class="flex items-center justify-center w-10 h-10 bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 rounded-full transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     @endforeach
