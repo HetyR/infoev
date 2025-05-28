@@ -45,20 +45,17 @@
             @if ($informasiKendaraan && count($informasiKendaraan) > 0)
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     @foreach ($informasiKendaraan as $kendaraan)
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all duration-300 overflow-hidden group">
+                        <div class="bg-white rounded shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all duration-300 overflow-hidden group">
                             <!-- Vehicle Image -->
                             <div class="relative bg-gray-50 aspect-square overflow-hidden">
                                 <a href="{{ route('vehicle.show', ['vehicle' => $kendaraan['slug']]) }}" class="block h-full">
-                                    @if(isset($kendaraan['gambar']) && !empty($kendaraan['gambar']))
-                                        <img src="{{ $kendaraan['gambar'] }}" 
-                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                                             alt="{{ ($kendaraan['merek'] ?? '') . ' ' . ($kendaraan['nama'] ?? '') }}"
-                                             loading="lazy"
-                                             onerror="this.style.display='none'; this.parentNode.querySelector('.placeholder').style.display='flex';">
-                                    @endif
+                                    <img src="{{ $kendaraan['gambar'] }}" 
+                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                                         alt="{{ ($kendaraan['merek'] ?? '') . ' ' . ($kendaraan['nama'] ?? '') }}"
+                                         loading="lazy">
                                     
                                     <!-- Placeholder for missing images -->
-                                    <div class="placeholder absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center {{ isset($kendaraan['gambar']) && !empty($kendaraan['gambar']) ? 'hidden' : 'flex' }}">
+                                    <div class="placeholder absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 hidden items-center justify-center">
                                         <div class="text-center">
                                             <svg class="w-8 h-8 text-gray-400 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
