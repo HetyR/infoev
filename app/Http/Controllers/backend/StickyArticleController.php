@@ -9,21 +9,29 @@ use Illuminate\Http\Request;
 
 class StickyArticleController extends Controller
 {
-public function index() {
-    $stickies = StickyArticle::with('blog.thumbnail')->latest()->get();
+    public function index()
+    {
+        // Eager load blog dan thumbnail agar relasi langsung tersedia
+        $stickies = StickyArticle::with('blog.thumbnail')->get();
 
-    // Debug
-    foreach ($stickies as $sticky) {
-        logger('sticky id: ' . $sticky->id);
-        logger('blog id: ' . ($sticky->blog?->id ?? 'NULL'));
-        logger('blog title: ' . ($sticky->blog?->title ?? 'NULL'));
-        logger('thumbnail path: ' . ($sticky->blog?->thumbnail?->path ?? 'NULL'));
+        // Debug log (optional, supaya kamu yakin data sudah benar)
+        foreach ($stickies as $sticky) {
+            \Log::debug('sticky id: ' . $sticky->id);
+            if ($sticky->blog) {
+                \Log::debug('blog id: ' . $sticky->blog->id);
+                \Log::debug('blog title: ' . $sticky->blog->title);
+                if ($sticky->blog->thumbnail) {
+                    \Log::debug('thumbnail path: ' . $sticky->blog->thumbnail->path);
+                } else {
+                    \Log::debug('no thumbnail');
+                }
+            } else {
+                \Log::debug('no blog');
+            }
+        }
+
+        return view('backend.sticky_article.index', compact('stickies'));
     }
-
-    return view('backend.sticky_article.index', [
-        'stickies' => $stickies
-    ]);
-}
 
 
 
@@ -38,6 +46,6 @@ public function index() {
 
     public function destroy(StickyArticle $stickyArticle) {
         $stickyArticle->delete();
-        return redirect()->route('backend.stickyArticle.index');
+        return redirect()->route('backend.sticky_article.index');
     }
 }

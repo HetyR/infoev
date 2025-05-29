@@ -12,20 +12,27 @@
                                 <th scope="col" class="text-center">Added At</th>
                                 <th scope="col" class="text-center" style="width: 15%">Menu</th>
                             </tr>
-                        </thead>                        
+                        </thead>
                         <tbody>
                             @foreach ($stickies as $sticky)
                                 <tr class="text-center">
                                     <th scope="row">{{ $loop->iteration }}</th>
                                     <td>
-                                        @if ($sticky->blog->thumbnail)
-                                            <img src="{{ asset('storage/' . $sticky->blog->thumbnail->path) }}" alt="" class="img-fluid" style="max-width: 150px">
+                                        @if ($sticky->blog && $sticky->blog->thumbnail)
+                                            <img src="{{ asset('storage/' . $sticky->blog->thumbnail->path) }}"
+                                                alt="Thumbnail" class="img-fluid" style="max-width: 150px;">
+                                        @else
+                                            <span class="text-muted">No Image</span>
                                         @endif
                                     </td>
-                                    <td class="text-start">{{ $sticky->blog->title }}</td>
-                                    <td>{{ $sticky->created_at }}</td>
+                                    <td class="text-start">
+                                        {{ $sticky->blog->title ?? 'No Blog Found' }}
+                                    </td>
+                                    <td>{{ $sticky->created_at->format('d M Y H:i') }}</td>
                                     <td>
-                                        <form class="d-inline-block" action="{{ route('backend.stickyArticle.destroy', ['stickyArticle' => $sticky->id]) }}" method="POST" onsubmit="return confirm('Remove sticky article?')">
+                                        <form class="d-inline-block"
+                                            action="{{ route('backend.stickyArticle.destroy', ['stickyArticle' => $sticky->id]) }}"
+                                            method="POST" onsubmit="return confirm('Remove sticky article?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger hover-shadow">
@@ -55,7 +62,7 @@
         <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js" crossorigin="anonymous"
             referrerpolicy="no-referrer"></script>
         <script>
-            $(document).ready(function () {
+            $(document).ready(function() {
                 $('#datatable').DataTable();
             });
         </script>
