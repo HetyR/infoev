@@ -13,8 +13,8 @@
                                 <th scope="col" class="text-center" style="width: 15%">Menu</th>
                             </tr>
                         </thead>
-                        <tbody> 
-                            @foreach ($stickies as $sticky)   
+                        <tbody>
+                            @foreach ($stickies as $sticky)
                                 <tr class="text-center">
                                     <th scope="row">{{ $loop->iteration }}</th>
                                     <td>
