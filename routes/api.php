@@ -11,13 +11,12 @@ use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\FinderController;
 use App\Http\Controllers\CommentController;
-use App\Http\Controllers\Api\LoginController; // Perbaiki penamaan class
+use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\ListController;
 use App\Http\Controllers\Api\ChargerStationController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Api\SpecTestController;
-use App\Http\Controllers\Api\FavoriteController;
-use App\Http\Controllers\backend\AffiliateController;
+use App\Http\Controllers\Api\FavoriteController; 
 
 /*
 |--------------------------------------------------------------------------
@@ -44,18 +43,18 @@ Route::post('/app-handshake', function (Request $request) {
     return response()->json(['app_key' => $appKey]);
 });
 
-//Update Route Keranjang Loved Vehicle
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/favorites', [FavoriteController::class, 'index']); // Menampilkan daftar favorit
-    Route::post('/favorites', [FavoriteController::class, 'store']); // Menambahkan kendaraan ke favorit
-    Route::delete('/favorites/{vehicleId}', [FavoriteController::class, 'remove']); // Menghapus kendaraan dari favorit
-});
-
 // Route Testing
 Route::prefix('v2')->group(function () {
     Route::get('/spec-categories', [SpecTestController::class, 'getSpecCategories']);
     Route::get('/specs', [SpecTestController::class, 'getSpecs']);
     Route::get('/spec-lists', [SpecTestController::class, 'getSpecLists']);
+});
+
+//Update Route Keranjang Loved Vehicle
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/favorites', [FavoriteController::class, 'index']); // Menampilkan daftar favorit
+    Route::post('/favorites', [FavoriteController::class, 'store']); // Menambahkan kendaraan ke favorit
+    Route::delete('/favorites/{vehicleId}', [FavoriteController::class, 'remove']); // Menghapus kendaraan dari favorit
 });
 
 Route::get('/', [HomeController::class, 'index']);
@@ -79,11 +78,7 @@ Route::get('/charger/search', [ChargerStationController::class, 'search'])->name
 
 // Find City
 Route::get('/cities', [ChargerStationController::class, 'getCities']);
-Route::get('/cities/search', [ChargerStationController::class, 'searchCities']);
-
-//Route Kebutuhan Alfaro
-Route::get('/vehicles/{vehicle}/affiliate', [AffiliateController::class, 'show']);
-Route::post('/vehicles/{vehicle}/affiliate', [AffiliateController::class, 'store']);
+Route::get('/cities/search', [ChargerStationController::class, 'searchCities']); 
 
 /// Route Default dari Pakde Arsi ///
 // Search
@@ -118,6 +113,6 @@ Route::get('/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show
 // Update Vehicle
 Route::post('/vehicles', [VehicleController::class, 'store']);
 
-Route::post('/comment/store', [CommentController::class, 'store'])->name('comment.post');
+Route::post('/comment/store', [CommentController::class, 'storeApi'])->name('comment.post');
 
 Route::get('/vehicles/{slug}/lists', [ListController::class, 'show']);

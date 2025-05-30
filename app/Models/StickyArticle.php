@@ -12,9 +12,8 @@ class StickyArticle extends Model
     protected $guarded = ['id', 'created_at', 'updated_at'];
 
     // Relationship
-public function blog()
-{
-    return $this->belongsTo(Blog::class, 'blog_id', 'id');
+    public function blog()
+    {
+        return $this->belongsTo(Blog::class, 'blog_id', 'id');
+    }
 }
-}
-

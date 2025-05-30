@@ -12,7 +12,7 @@ class StickyArticleController extends Controller
     public function index()
     {
         // Eager load blog dan thumbnail agar relasi langsung tersedia
-        $stickies = StickyArticle::with('blog.thumbnail')->get();
+        $stickies = StickyArticle::with('blog.thumbnail')->get(); 
 
         // Debug log (optional, supaya kamu yakin data sudah benar)
         foreach ($stickies as $sticky) {

@@ -13,20 +13,20 @@
                                 <th scope="col" class="text-center" style="width: 15%">Menu</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach ($stickies as $sticky)
+                        <tbody> 
+                            @foreach ($stickies as $sticky)   
                                 <tr class="text-center">
                                     <th scope="row">{{ $loop->iteration }}</th>
                                     <td>
-                                        @if ($sticky->blog && $sticky->blog->thumbnail)
-                                            <img src="{{ asset('storage/' . $sticky->blog->thumbnail->path) }}"
+                                        @if ($sticky && $sticky->thumbnail)
+                                            <img src="{{ asset('storage/' . $sticky->thumbnail->path) }}"
                                                 alt="Thumbnail" class="img-fluid" style="max-width: 150px;">
                                         @else
                                             <span class="text-muted">No Image</span>
                                         @endif
                                     </td>
                                     <td class="text-start">
-                                        {{ $sticky->blog->title ?? 'No Blog Found' }}
+                                        {{ $sticky->title ?? 'No Blog Found' }}
                                     </td>
                                     <td>{{ $sticky->created_at->format('d M Y H:i') }}</td>
                                     <td>
