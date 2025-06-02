@@ -96,12 +96,12 @@ class BlogController extends Controller
                 'image' => $imageUrl ?? '',
             ],
             'data' => [
-        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-        'id' => (string) $blog->id,
-        'title' => $blog->title,
-        'summary' => $blog->summary,
-        'image' => $imageUrl ?? '',
-    ],
+                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                'id' => (string) $blog->id,
+                'title' => $blog->title,
+                'summary' => $blog->summary,
+                'image' => $imageUrl ?? '',
+            ],
         ]);
 
         $this->messaging->send($message);
