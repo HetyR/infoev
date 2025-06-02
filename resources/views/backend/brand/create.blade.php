@@ -1,0 +1,49 @@
+<x-layouts.backend title="Tambah Brand">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 my-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white fw-bold">
+                    Add New Brand
+                </div>
+                <div class="card-body">
+
+                    {{-- Flash Message (optional) --}}
+                    @if (session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    <form method="POST" action="{{ route('backend.brand.store') }}" enctype="multipart/form-data">
+                        @csrf
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Brand</label>
+                            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}">
+                            @error('name')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="banner" class="form-label">Banner</label>
+                            <input type="file" class="form-control @error('banner') is-invalid @enderror" id="banner" name="banner" accept="image/*">
+                            @error('banner')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+
+                        <div class="d-flex justify-content-start gap-2 mt-4">
+                            <button type="submit" class="btn btn-sm btn-outline-primary hover-shadow">
+                                <i class="fas fa-save me-1"></i> Submit
+                            </button>
+                            <a href="{{ route('backend.brand.index') }}" class="btn btn-sm btn-outline-secondary hover-shadow">
+                                <i class="fas fa-arrow-left me-1"></i> Back
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-layouts.backend>
