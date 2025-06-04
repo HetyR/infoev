@@ -103,8 +103,7 @@ Route::middleware('auth')->group(function () {
             // Sticky Article
             Route::get('sticky-articles', [StickyArticleController::class, 'index'])->name('backend.stickyArticle.index');
             Route::post('sticky-articles/{blog}', [StickyArticleController::class, 'store'])->name('backend.stickyArticle.store');
-            Route::delete('sticky-articles/{stickyArticle}', [StickyArticleController::class, 'destroy'])->name('backend.stickyArticle.destroy');
-
+            Route::delete('/backend/sticky-articles/{stickyArticle:blog_id}', [StickyArticleController::class, 'destroy']) ->name('backend.stickyArticle.destroy');
 
             // Tips and Trick
             Route::post('/tips-and-trick/store/{blog}', [BackendTipsController::class, 'store'])->name('backend.tipsAndTrick.store');

@@ -14,7 +14,7 @@ class StickyArticle extends Model
     // Relationship
  public function blog()
 {
-    return $this->belongsTo(Blog::class, 'blog_id');
+    return $this->belongsTo(Blog::class, 'blog_id','id');
 }
 }
 

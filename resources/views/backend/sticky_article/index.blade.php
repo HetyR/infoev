@@ -31,10 +31,10 @@
                                     <td class="text-center">{{ $sticky->created_at->format('d M Y H:i') }}</td>
                                     <td class="text-center">
                                         <form class="d-inline-block"
-                                            action="{{ route('backend.stickyArticle.destroy', ['stickyArticle' => $sticky->id]) }}"
+                                            action="{{ route('backend.stickyArticle.destroy', ['stickyArticle' => $sticky->blog_id]) }}"
                                             method="POST" onsubmit="return confirm('Remove sticky article?')">
                                             @csrf
-                                            @method('DELETE')
+                                            <input type="hidden" name="_method" value="DELETE">
                                             <button type="submit" class="btn btn-sm btn-outline-danger hover-shadow">
                                                 <i class="fas fa-trash-alt me-1"></i> Delete
                                             </button>
