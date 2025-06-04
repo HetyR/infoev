@@ -10,13 +10,23 @@ use Illuminate\Support\Facades\Storage;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
 use Kreait\Laravel\Firebase\Facades\Firebase;
+use Kreait\Firebase\Contract\Messaging;
 
 class BlogController extends Controller
 {
+    protected Messaging $messaging;
+
+    public function __construct(Messaging $messaging)
+    {
+        $this->messaging = $messaging;
+    }
+
     public function index()
     {
         return view('backend.blog.index', [
-            'posts' => Blog::with(['thumbnail', 'sticky', 'tipsAndTrick'])->latest()->paginate(10)
+            'posts' => Blog::with(['thumbnail', 'sticky', 'tipsAndTrick'])
+                ->latest()
+                ->paginate(10),
         ]);
     }
     public function storeTipsAndTrick(Blog $blog, Request $request)
@@ -56,7 +66,7 @@ class BlogController extends Controller
             'content' => 'required|string',
             'status' => 'required|boolean',
             'featured' => 'nullable',
-            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048'
+            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $formFields = [
@@ -64,20 +74,40 @@ class BlogController extends Controller
             'summary' => $validated['summary'],
             'content' => $validated['content'],
             'published' => $validated['status'],
-            'featured' => $request->has('featured') ? 1 : 0
+            'featured' => $request->has('featured') ? 1 : 0,
         ];
 
         $blog = Blog::create($formFields);
 
+        $imageUrl = null;
+
         if ($request->hasFile('thumbnail')) {
-            $blog->thumbnail()->create([
-                'path' => $request->file('thumbnail')->store('blog', 'public'),
-            ]);
+            $path = $request->file('thumbnail')->store('blog', 'public');
+            $blog->thumbnail()->create(['path' => $path]);
+            $imageUrl = Storage::disk('public')->url($path);
         }
+
+        // Tambahkan gambar ke Notification, bukan hanya di data
+        $message = CloudMessage::fromArray([
+            'topic' => 'infoev_news',
+            'notification' => [
+                'title' => $blog->title,
+                'body' => $blog->summary,
+                'image' => $imageUrl ?? '',
+            ],
+            'data' => [
+                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                'id' => (string) $blog->id,
+                'title' => $blog->title,
+                'summary' => $blog->summary,
+                'image' => $imageUrl ?? '',
+            ],
+        ]);
+
+        $this->messaging->send($message);
 
         return redirect()->route('backend.blog.index');
     }
-
 
     public function edit(Blog $blog)
     {

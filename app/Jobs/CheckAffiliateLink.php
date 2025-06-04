@@ -22,19 +22,30 @@ class CheckAffiliateLink implements ShouldQueue
 
     public function handle()
     {
-        $url = $this->link->link;
-        $isActive = false;
+        try {
+            $url = $this->link->link;
+            $isActive = false;
 
-        // Cek platform berdasarkan domain di URL
-        if (strpos($url, 'shopee') !== false) {
-            $isActive = $this->checkShopeeLinkActive($url);
-        } elseif (strpos($url, 'tokopedia') !== false) {
-            $isActive = $this->checkTokopediaLinkActive($url);
+            // Cek platform berdasarkan domain di URL
+            if (strpos($url, 'shopee') !== false) {
+                $isActive = $this->checkShopeeLinkActive($url);
+            } elseif (strpos($url, 'tokopedia') !== false) {
+                $isActive = $this->checkTokopediaLinkActive($url);
+            }
+
+            $this->link->is_active = $isActive;
+            $this->link->last_checked_at = now();
+            $this->link->save();
+
+            \Log::info('Job CheckAffiliateLink untuk URL ' . $url . ' berhasil dijalankan pada ' . now() . ' dengan status: ' . ($isActive ? 'Active' : 'Inactive'));
+
+        } catch (\Exception $e) {
+            \Log::error('Job CheckAffiliateLink untuk URL ' . $url . ' gagal dijalankan pada ' . now() . ', Error: ' . $e->getMessage());
+            // Tandai link sebagai tidak aktif jika gagal
+            $this->link->is_active = false;
+            $this->link->last_checked_at = now();
+            $this->link->save();
         }
-
-        $this->link->is_active = $isActive;
-        $this->link->last_checked_at = now();
-        $this->link->save();
     }
 
     private function checkShopeeLinkActive(string $url): bool
@@ -43,7 +54,6 @@ class CheckAffiliateLink implements ShouldQueue
         curl_setopt($ch, CURLOPT_NOBODY, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        // Set user-agent biar request mirip browser
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36');
         curl_exec($ch);
 
@@ -51,15 +61,13 @@ class CheckAffiliateLink implements ShouldQueue
         $finalUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
         curl_close($ch);
 
-        // Kalau status http error 400 ke atas, link dianggap mati
         if ($httpCode >= 400) {
             return false;
         }
 
-        // Jika redirect ke halaman error shopee, login, captcha, anggap mati
-        if (strpos($finalUrl, 'error_page') !== false
-            || strpos($finalUrl, 'login') !== false
-            || strpos($finalUrl, 'captcha') !== false) {
+        if (strpos($finalUrl, 'error_page') !== false ||
+            strpos($finalUrl, 'login') !== false ||
+            strpos($finalUrl, 'captcha') !== false) {
             return false;
         }
 
@@ -72,7 +80,6 @@ class CheckAffiliateLink implements ShouldQueue
         curl_setopt($ch, CURLOPT_NOBODY, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        // Set user-agent biar request mirip browser
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36');
         curl_exec($ch);
 
@@ -80,15 +87,13 @@ class CheckAffiliateLink implements ShouldQueue
         $finalUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
         curl_close($ch);
 
-        // Kalau status http error 400 ke atas, link dianggap mati
         if ($httpCode >= 400) {
             return false;
         }
 
-        // Jika redirect ke halaman error tokopedia, login, atau tidak ditemukan, anggap mati
-        if (strpos($finalUrl, 'error') !== false
-            || strpos($finalUrl, 'login') !== false
-            || strpos($finalUrl, 'not-found') !== false) {
+        if (strpos($finalUrl, 'error') !== false ||
+            strpos($finalUrl, 'login') !== false ||
+            strpos($finalUrl, 'not-found') !== false) {
             return false;
         }
 
