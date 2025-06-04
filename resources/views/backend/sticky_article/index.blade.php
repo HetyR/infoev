@@ -31,7 +31,7 @@
                                     <td>{{ $sticky->created_at->format('d M Y H:i') }}</td>
                                     <td>
                                         <form class="d-inline-block"
-                                            action="{{ route('backend.stickyArticle.destroy', ['stickyArticle' => $sticky->id]) }}"
+                                            action="{{ route('backend.stickyArticle.destroy', ['stickyArticle' => $sticky->blog_id]) }}"
                                             method="POST" onsubmit="return confirm('Remove sticky article?')">
                                             @csrf
                                             @method('DELETE')

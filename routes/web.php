@@ -101,9 +101,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/blog', [BackendBlogController::class, 'index'])->name('backend.blog.index');
 
             // Sticky Article
-            Route::post('/sticky-articles/store/{blog}', [StickyArticleController::class, 'store'])->name('backend.stickyArticle.store');
-            Route::delete('/sticky-articles/{stickyArticle}', [StickyArticleController::class, 'destroy'])->name('backend.stickyArticle.destroy');
-            Route::get('/sticky-articles', [StickyArticleController::class, 'index'])->name('backend.stickyArticle.index');
+            Route::get('sticky-articles', [StickyArticleController::class, 'index'])->name('backend.stickyArticle.index');
+            Route::post('sticky-articles/{blog}', [StickyArticleController::class, 'store'])->name('backend.stickyArticle.store');
+            Route::delete('/backend/sticky-articles/{stickyArticle:blog_id}', [StickyArticleController::class, 'destroy']) ->name('backend.stickyArticle.destroy');
 
             // Tips and Trick
             Route::post('/tips-and-trick/store/{blog}', [BackendTipsController::class, 'store'])->name('backend.tipsAndTrick.store');
@@ -161,7 +161,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Charger
-Route::get('/charger', [ChargerController::class,'index'])->name('charger.index');
+Route::get('/charger', [ChargerController::class, 'index'])->name('charger.index');
 Route::get('/charger/search', [ChargerController::class, 'search'])->name('charger.search');
 // Route::get('/charging-stations', [ChargingStationController::class, 'index'])->name('charging.stations');
 
