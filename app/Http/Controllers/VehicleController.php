@@ -98,8 +98,7 @@ class VehicleController extends Controller
 
         if ($vehicle->countView()) {
             VehicleView::createViewLog($vehicle);
-        }
-
+        }  
 
         return view('vehicle.show', [
             'bikeBrands' => Brand::limit(14)

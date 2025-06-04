@@ -30,6 +30,7 @@ class VehicleController extends Controller
             return response()->json(['error' => 'Resource not found'], 404);
         }
 
+        // Ambil kategori spesifikasi beserta relasi kendaraan spesifik
         $specCategories = SpecCategory::with([
             'specs',
             'specs.vehicles' => function ($query) use ($vehicle) {
@@ -40,45 +41,56 @@ class VehicleController extends Controller
             ->orderBy('priority')
             ->get();
 
-        $highlightSpecIds = Spec::whereIn('name', ['kapasitas', 'pengisian daya ac', 'kecepatan maksimal', 'jarak tempuh'])
-            ->get()
-            ->pluck('id');
+        // Tambahkan list_items jika tipe 'list'
+        foreach ($specCategories as $category) {
+            foreach ($category->specs as $spec) {
+                $pivot = $spec->vehicles->first()?->pivot;
 
-        $specs = Vehicle::find($vehicle->id)->specs()->wherePivotIn('spec_id', $highlightSpecIds)->get();
+                if ($pivot && $spec->type === 'list') {
+                    $pivotModel = \App\Models\SpecVehicle::with('lists')->find($pivot->id);
+                    $pivot->list_items = $pivotModel?->lists?->pluck('list');
+                }
+            }
+        }
+
+        // Highlight specs
+        $highlightSpecIds = Spec::whereIn('name', ['kapasitas', 'pengisian daya ac', 'kecepatan maksimal', 'jarak tempuh'])->pluck('id');
+
+        $specs = $vehicle->specs()->wherePivotIn('spec_id', $highlightSpecIds)->get();
         $highlightSpecs = [];
 
         foreach ($specs as $spec) {
             $push = [];
-            switch ($spec->name) {
-                case 'Kapasitas':
+            switch (strtolower($spec->name)) {
+                case 'kapasitas':
                     $push['type'] = 'capacity';
                     $push['value'] = (float) $spec->pivot->value;
                     $push['unit'] = $spec->unit;
                     break;
-                case 'Pengisian Daya AC':
+                case 'pengisian daya ac':
                     $push['type'] = 'charge';
                     $push['value'] = (float) $spec->pivot->value;
                     $push['unit'] = $spec->unit;
                     $push['desc'] = $spec->pivot->value_desc;
                     break;
-                case 'Kecepatan Maksimal':
+                case 'kecepatan maksimal':
                     $push['type'] = 'maxSpeed';
                     $push['value'] = (float) $spec->pivot->value;
                     $push['unit'] = $spec->unit;
                     break;
-                case 'Jarak Tempuh':
+                case 'jarak tempuh':
                     $push['type'] = 'range';
                     $push['value'] = (float) $spec->pivot->value;
                     $push['unit'] = $spec->unit;
                     break;
-                default:
-                    break;
             }
 
-            array_push($highlightSpecs, $push);
+            if (!empty($push)) {
+                $highlightSpecs[] = $push;
+            }
         }
 
-        // Prepare affiliate links data
+        // Affiliate links
         $affiliateLinks = $vehicle->affiliateLinks->map(function ($affiliate) {
             return [
                 'link' => $affiliate->link,
@@ -86,34 +98,31 @@ class VehicleController extends Controller
             ];
         });
 
-        // Cek apakah user login atau guest
+        // Favorite check
         $user = Auth::guard('sanctum')->user();
+        $isFavorite = $user ? $user->lovedVehicles()->where('vehicle_id', $vehicle->id)->exists() : false;
 
-        $isFavorite = false;
-        if ($user) {
-            $isFavorite = $user->lovedVehicles()->where('vehicle_id', $vehicle->id)->exists();
-        }
-
+        // Comments & Replies
         $totalCommentsCount = Comment::where('commentable_type', Vehicle::class)->where('commentable_id', $vehicle->id)->count();
 
         $comments = $vehicle
             ->comments()
-            ->whereNull('parent_id') // hanya ambil komentar utama, bukan reply
+            ->whereNull('parent_id')
             ->with(['user:id,name', 'replies.user:id,name'])
             ->get()
             ->map(function ($comment) {
                 return [
                     'id' => $comment->id,
                     'user' => $comment->user,
-                    'name' => $comment->hide_name == 1 || $comment->name === null ? 'Anonimus' : $comment->name,
-                    'comment' => $comment->hide_comment == 1 ? 'comment tidak tersedia' : $comment->comment,
+                    'name' => $comment->hide_name || !$comment->name ? 'Anonimus' : $comment->name,
+                    'comment' => $comment->hide_comment ? 'comment tidak tersedia' : $comment->comment,
                     'created_at' => $comment->created_at->toDateTimeString(),
                     'replies' => $comment->replies->map(function ($reply) {
                         return [
                             'id' => $reply->id,
                             'user' => $reply->user,
-                            'name' => $reply->hide_name == 1 || $reply->name === null ? 'Anonimus' : $reply->name,
-                            'comment' => $reply->hide_comment == 1 ? 'comment tidak tersedia' : $reply->comment,
+                            'name' => $reply->hide_name || !$reply->name ? 'Anonimus' : $reply->name,
+                            'comment' => $reply->hide_comment ? 'comment tidak tersedia' : $reply->comment,
                             'created_at' => $reply->created_at->toDateTimeString(),
                         ];
                     }),
@@ -124,11 +133,10 @@ class VehicleController extends Controller
             'specCategories' => $specCategories,
             'highlightSpecs' => $highlightSpecs,
             'vehicle' => $vehicle,
-            'affiliateLinks' => $affiliateLinks, // Add affiliate links to JSON response
-            'isLoved' => $isFavorite, // Tambahkan flag favorit
+            'affiliateLinks' => $affiliateLinks,
+            'isLoved' => $isFavorite,
             'comments' => $comments,
-            'comments_count' => $totalCommentsCount, // 👈 Tambahan count di sini
-            // Add other data here...
+            'comments_count' => $totalCommentsCount,
         ]);
     }
 

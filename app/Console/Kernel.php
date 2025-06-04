@@ -10,6 +10,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
     $schedule->command('affiliate:check-links')->dailyAt('09:00'); 
+    // $schedule->command('affiliate:check-links')->everyFiveMinutes();
     }
 
     protected function commands()

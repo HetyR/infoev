@@ -16,7 +16,7 @@ use App\Http\Controllers\Api\ListController;
 use App\Http\Controllers\Api\ChargerStationController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Api\SpecTestController;
-use App\Http\Controllers\Api\FavoriteController; 
+use App\Http\Controllers\Api\FavoriteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,7 +78,7 @@ Route::get('/charger/search', [ChargerStationController::class, 'search'])->name
 
 // Find City
 Route::get('/cities', [ChargerStationController::class, 'getCities']);
-Route::get('/cities/search', [ChargerStationController::class, 'searchCities']); 
+Route::get('/cities/search', [ChargerStationController::class, 'searchCities']);
 
 /// Route Default dari Pakde Arsi ///
 // Search
@@ -103,9 +103,10 @@ Route::get('/merek', [BrandController::class, 'index'])->name('brand.index');
 Route::post('/merek', [BrandController::class, 'store']);
 
 // Route::middleware('verify.app.key')->group(function () {
-    // Type
-    Route::get('/tipe', [TypeController::class, 'index'])->name('type.index');
-    Route::get('/tipe/{type}', [TypeController::class, 'show'])->name('type.show');
+// Typeconfig
+Route::get('/tipe', [TypeController::class, 'index'])->name('type.index');
+Route::get('/tipe/{type}', [TypeController::class, 'show'])->name('type.show');
+Route::get('/tipe/v2/{type}', [TypeController::class, 'show2'])->name('type.show2');
 // });
 
 // Vehicle

@@ -11,9 +11,7 @@ class TipsAndTrick extends Model
     protected $guarded = ['id', 'created_at', 'updated_at'];
 
     public function blog()
-{
-    return $this->belongsTo(Blog::class);
+    {
+        return $this->belongsTo(Blog::class);
+    }
 }
-
-}
-
