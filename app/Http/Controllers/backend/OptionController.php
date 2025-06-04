@@ -15,78 +15,125 @@ use App\Http\Controllers\Controller;
 use App\Models\Option;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class OptionController extends Controller
 {
-    public function index() {
+    public function index()
+    {
+        // Pastikan entri awal ada
+        $requiredBanners = ['blog', 'brand', 'type'];
+        foreach ($requiredBanners as $name) {
+            if (!Option::where('type', 'banner')->where('name', $name)->exists()) {
+                Option::create([
+                    'type' => 'banner',
+                    'name' => $name,
+                    'value' => '' // Nilai default untuk kolom value
+                ]);
+            }
+        }
+        if (!Option::where('type', 'logo')->exists()) {
+            Option::create([
+                'type' => 'logo',
+                'name' => 'site_logo',
+                'value' => '' // Nilai default untuk kolom value
+            ]);
+        }
+
         return view('backend.option.index', [
             'banners' => Option::where('type', 'banner')->orderBy('name')->with('thumbnail')->get(),
             'logo' => Option::where('type', 'logo')->with('thumbnail')->first()
         ]);
     }
 
-    public function update(Request $request) {
+    public function update(Request $request)
+    {
         // Validasi file yang diupload
         $request->validate([
-            'banner.*' => 'nullable|image|max:2048',  // Maksimal 2MB untuk banner
-            'logo' => 'nullable|image|max:2048',      // Maksimal 2MB untuk logo
+            'banner.*' => 'nullable|image|max:2048',
+            'logo' => 'nullable|image|max:2048',
         ]);
+
+        // Log request data untuk debugging
+        Log::info('Request data: ', $request->all());
 
         // Logic untuk banner
         if ($request->hasFile('banner')) {
             $newBanners = array_values($request->file('banner'));
-            $ids = $request->banner_id;
+            $ids = $request->banner_id ?? [];
 
             foreach ($newBanners as $index => $newBanner) {
+                if (!isset($ids[$index])) {
+                    Log::warning("Banner ID pada index {$index} tidak ditemukan. Melewati.");
+                    continue;
+                }
+
                 $currentBanner = Option::with('thumbnail')->find($ids[$index]);
 
-                // Pastikan $currentBanner ditemukan
+                // Jika banner tidak ditemukan, buat entri baru
                 if (!$currentBanner) {
-                    continue; // Lanjutkan jika ID tidak ditemukan
+                    Log::warning("Banner ID {$ids[$index]} tidak ditemukan. Membuat entri baru.");
+                    $currentBanner = Option::create([
+                        'type' => 'banner',
+                        'name' => 'banner_' . $ids[$index],
+                        'value' => '' // Nilai default untuk kolom value
+                    ]);
                 }
 
                 if ($currentBanner->thumbnail) {
-                    // Hapus gambar lama jika ada
                     Storage::delete('public/' . $currentBanner->thumbnail->path);
                     $currentBanner->thumbnail->delete();
+                    Log::info("Gambar banner lama dihapus: " . $currentBanner->thumbnail->path);
                 }
 
-                // Simpan gambar baru
+                $path = $newBanner->store('banner', 'public');
                 $currentBanner->thumbnail()->create([
-                    'path' => $newBanner->store('banner', 'public')
+                    'path' => $path,
+                    'fileable_id' => $currentBanner->id,
+                    'fileable_type' => Option::class
                 ]);
+                Log::info("Banner ID {$ids[$index]} berhasil diperbarui dengan path: {$path}");
             }
         }
 
         // Logic untuk logo
         if ($request->hasFile('logo')) {
+            Log::info("File logo diunggah: " . $request->file('logo')->getClientOriginalName());
             $newLogo = $request->file('logo');
-            $currentLogo = Option::with('thumbnail')->find($request->logo_id);
+            $currentLogo = Option::where('type', 'logo')->with('thumbnail')->first();
 
-            // Pastikan $currentLogo ditemukan
+            // Jika logo tidak ditemukan, buat entri baru
             if (!$currentLogo) {
-                return redirect()->route('backend.option.index')->with('error', 'Logo ID tidak ditemukan.');
+                Log::info("Logo dengan type 'logo' tidak ditemukan. Membuat entri baru.");
+                $currentLogo = Option::create([
+                    'type' => 'logo',
+                    'name' => 'site_logo',
+                    'value' => '' // Nilai default untuk kolom value
+                ]);
             }
 
             if ($currentLogo->thumbnail) {
-                // Hapus gambar lama jika ada
                 Storage::delete('public/' . $currentLogo->thumbnail->path);
                 $currentLogo->thumbnail->delete();
+                Log::info("Gambar logo lama dihapus: " . $currentLogo->thumbnail->path);
             }
 
-            // Simpan gambar logo baru
+            $path = $newLogo->store('assets', 'public');
             $currentLogo->thumbnail()->create([
-                'path' => $newLogo->store('assets', 'public')
+                'path' => $path,
+                'fileable_id' => $currentLogo->id,
+                'fileable_type' => Option::class
             ]);
+            Log::info("Logo baru disimpan dengan path: {$path}");
+        } else {
+            Log::warning("Tidak ada file logo yang diunggah.");
         }
 
-        // Redirect setelah sukses
         return redirect()->route('backend.option.index')->with('success', 'Assets updated successfully.');
     }
 
     public function dashboard()
     {
-        // Mengambil total jumlah data dari setiap model
         $totalTypes = Type::count();
         $totalBrands = Brand::count();
         $totalBlogs = Blog::count();
@@ -97,9 +144,8 @@ class OptionController extends Controller
         $totalComments = Comment::count();
         $totalTipsAndTrick = TipsAndTrick::count();
 
-        // Mengirimkan data ke view dashboard
         return view('backend.option.dashboard', compact(
-            'totalTypes', 'totalBrands', 'totalBlogs', 'totalStickyArticles', 
+            'totalTypes', 'totalBrands', 'totalBlogs', 'totalStickyArticles',
             'totalSpecs', 'totalVehicles', 'totalMarketplaces', 'totalComments', 'totalTipsAndTrick'
         ));
     }

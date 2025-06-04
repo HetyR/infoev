@@ -3,7 +3,7 @@
         <div class="col-md-12 my-4">
             <div class="card shadow-sm rounded">
                 <div class="card-body">
-                    <table id="datatable" class="table align-middle">
+                    <table id="datatable" class="table align-middle text-center">
                         <thead>
                             <tr>
                                 <th scope="col" class="text-center">#</th>
@@ -15,9 +15,9 @@
                         </thead>
                         <tbody>
                             @foreach ($stickies as $sticky)
-                                <tr class="text-center">
-                                    <th scope="row">{{ $loop->iteration }}</th>
-                                    <td>
+                                <tr>
+                                    <th scope="row" class="text-center">{{ $loop->iteration }}</th>
+                                    <td class="text-center">
                                         @if ($sticky && $sticky->thumbnail)
                                             <img src="{{ asset('storage/' . $sticky->thumbnail->path) }}"
                                                 alt="Thumbnail" class="img-fluid" style="max-width: 150px;">
@@ -25,11 +25,11 @@
                                             <span class="text-muted">No Image</span>
                                         @endif
                                     </td>
-                                    <td class="text-start">
+                                    <td class="text-center">
                                         {{ $sticky->title ?? 'No Blog Found' }}
                                     </td>
-                                    <td>{{ $sticky->created_at->format('d M Y H:i') }}</td>
-                                    <td>
+                                    <td class="text-center">{{ $sticky->created_at->format('d M Y H:i') }}</td>
+                                    <td class="text-center">
                                         <form class="d-inline-block"
                                             action="{{ route('backend.stickyArticle.destroy', ['stickyArticle' => $sticky->id]) }}"
                                             method="POST" onsubmit="return confirm('Remove sticky article?')">
@@ -52,7 +52,14 @@
     <x-slot:css>
         <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css"
             crossorigin="anonymous" referrerpolicy="no-referrer" />
-    </x-slot>
+        <style>
+            .dataTables_wrapper .dataTables_paginate .page-item.active .page-link {
+                color: #fff !important;
+                background-color: #0d6efd !important;
+                border-color: #0d6efd !important;
+            }
+        </style>
+    </x-slot:css>
 
     <x-slot:js>
         <script src="https://code.jquery.com/jquery-3.7.0.min.js"
@@ -66,5 +73,5 @@
                 $('#datatable').DataTable();
             });
         </script>
-    </x-slot>
+    </x-slot:js>
 </x-layouts.backend>

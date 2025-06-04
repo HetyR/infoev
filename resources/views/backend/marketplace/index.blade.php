@@ -2,7 +2,7 @@
     <section class="section">
         <div class="row">
             <div class="col-md-12 mb-4 text-end">
-                <a href="{{ route('backend.marketplace.create') }}" class="btn btn-sm btn-success hover-shadow">
+                <a href="{{ route('backend.marketplace.create') }}" class="btn btn-sm btn-outline-success hover-shadow">
                     <i class="fas fa-plus me-1"></i> Add New Marketplace
                 </a>
             </div>  

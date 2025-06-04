@@ -74,9 +74,18 @@
         </div>
     </div>
 
-    <x-slot:css>
+
+     <x-slot:css>
         <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    </x-slot>
+        <style>
+            .dataTables_wrapper .dataTables_paginate .page-item.active .page-link {
+                color: #fff !important;
+                background-color: #0d6efd !important;
+                border-color: #0d6efd !important;
+            }
+        </style>
+    </x-slot:css>
+
     
     <x-slot:js>
         <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>

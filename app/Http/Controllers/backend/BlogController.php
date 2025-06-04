@@ -16,7 +16,7 @@ class BlogController extends Controller
     public function index()
     {
         return view('backend.blog.index', [
-            'posts' => Blog::with(['thumbnail', 'sticky', 'tipsAndTrick'])->latest()->paginate(10)
+            'posts' => Blog::with(['thumbnail', 'sticky', 'tipsAndTrick'])->latest()->get()
         ]);
     }
     public function storeTipsAndTrick(Blog $blog, Request $request)
