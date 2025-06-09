@@ -13,7 +13,7 @@ class VerifyAppKey
         $appKey = $request->header('X-APP-KEY');
 
         if (!$appKey) {
-            return response()->json(['message' => 'Missing X-APP-KEY'], 404);
+            abort(404);
         }
 
         $token = AppToken::where('app_key', $appKey)->first();
@@ -22,7 +22,11 @@ class VerifyAppKey
             return response()->json(['message' => 'Invalid X-APP-KEY'], 401);
         }
 
-        // Update last used
+        // (Optional) cek expired token
+        if ($token->created_at->lt(now()->subDays(7))) {
+            return response()->json(['message' => 'Expired X-APP-KEY'], 401);
+        }
+
         $token->update(['last_used_at' => now()]);
 
         return $next($request);

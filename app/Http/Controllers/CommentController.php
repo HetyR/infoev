@@ -32,4 +32,56 @@ class CommentController extends Controller
 
         return redirect()->back()->withFragment('#comment');
     }
+
+    public function storeApi(Request $request) {
+        // Validasi input terlebih dahulu
+        $validated = $request->validate([
+            'type' => 'required|string',
+            'id' => 'required|integer',
+            'name' => 'nullable|string|max:25',
+            'comment' => 'required|string|max:255',
+            'parent' => 'nullable|integer',
+        ]);
+
+        // Cari model commentable berdasarkan type dan id
+        switch ($validated['type']) {
+            case 'vehicle':
+                $commentable = Vehicle::find($validated['id']);
+                if (!$commentable) {
+                    return response()->json(
+                        [
+                            'message' => 'Vehicle not found',
+                        ],
+                        404,
+                    );
+                }
+                break;
+            default:
+                return response()->json(
+                    [
+                        'message' => 'Unsupported comment type',
+                    ],
+                    400,
+                );
+        }
+
+        // Siapkan data komentar
+        $fields = [
+            'name' => $validated['name'] ?? null,
+            'comment' => $validated['comment'],
+            'parent_id' => $validated['parent'] ?? null,
+        ];
+
+        // Buat komentar
+        $comment = $commentable->comments()->create($fields);
+
+        // Response sukses dengan data komentar baru
+        return response()->json(
+            [
+                'message' => 'Comment created successfully',
+                'data' => $comment,
+            ],
+            201,
+        );
+    }
 }
