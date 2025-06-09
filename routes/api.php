@@ -17,7 +17,7 @@ use App\Http\Controllers\Api\ListController;
 use App\Http\Controllers\Api\ChargerStationController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Api\SpecTestController;
-use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\FavoriteController; 
 
 /*
 |--------------------------------------------------------------------------
@@ -65,15 +65,30 @@ Route::post('/app-handshake', function (Request $request) {
     return response()->json(['app_key' => $appKey]);
 });
 
+
 /*
 |--------------------------------------------------------------------------
 | User Authentication Routes
-|--------------------------------------------------------------------------
-*/
+    Route::get('/spec-lists', [SpecTestController::class, 'getSpecLists']);
+});
+
+//Update Route Keranjang Loved Vehicle
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/favorites', [FavoriteController::class, 'index']); // Menampilkan daftar favorit
+    Route::post('/favorites', [FavoriteController::class, 'store']); // Menambahkan kendaraan ke favorit
+    Route::delete('/favorites/{vehicleId}', [FavoriteController::class, 'remove']); // Menghapus kendaraan dari favorit
+});
+
+Route::get('/', [HomeController::class, 'index']);
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
+/// Route Baru dari Programmer Handal ///
+>>>>>>> 52fa865 (Simpan perubahan lokal)
 // Auth
 Route::prefix('auth')->group(function () {
     // Login
-    Route::post('/login', [LoginController::class, 'login']);
     // Login with google
     Route::post('/google/login', [LoginController::class, 'loginWithGoogle']);
     // Logout
@@ -85,21 +100,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-/*
-|--------------------------------------------------------------------------
-| App Key Protected Routes
-|--------------------------------------------------------------------------
-*/
-Route::middleware('verify.app.key')->group(function () {
-    //Home
-    Route::get('/', [HomeController::class, 'index']);
-
-    /*
-    | Blog Routes
-    */
-    Route::get('/berita/{blog}', [BlogController::class, 'show'])->name('blog.show');
-    Route::get('/berita', [BlogController::class, 'index'])->name('blog.index');
-    Route::post('/blogs', [BlogController::class, 'store']);
+// Find City
+Route::get('/cities', [ChargerStationController::class, 'getCities']);
+Route::get('/cities/search', [ChargerStationController::class, 'searchCities']); 
 
     /*
     | Authenticated User Routes
@@ -121,7 +124,6 @@ Route::middleware('verify.app.key')->group(function () {
     */
     Route::get('/cities', [ChargerStationController::class, 'getCities']);
     Route::get('/cities/search', [ChargerStationController::class, 'searchCities']);
-});
 
 /*
 |--------------------------------------------------------------------------
@@ -167,6 +169,9 @@ Route::get('/tipe/{type}', [TypeController::class, 'show'])->name('type.show');
 */
 Route::get('/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
 Route::post('/vehicles', [VehicleController::class, 'store']);
+
+Route::post('/comment/store', [CommentController::class, 'storeApi'])->name('comment.post');
+
 Route::get('/vehicles/{slug}/lists', [ListController::class, 'show']);
 
 /*
