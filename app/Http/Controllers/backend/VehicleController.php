@@ -13,9 +13,20 @@ use App\Models\Vehicle;
 use App\Models\Marketplace;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
+use Kreait\Laravel\Firebase\Facades\Firebase;
+use Kreait\Firebase\Contract\Messaging;
 
 class VehicleController extends Controller
 {
+    protected Messaging $messaging;
+
+    public function __construct(Messaging $messaging)
+    {
+        $this->messaging = $messaging;
+    }
+
     public function index(Request $request)
     {
         $typeId = $request->input('type_id');
@@ -57,51 +68,49 @@ class VehicleController extends Controller
         ]);
     }
 
-
     public function create()
     {
         return view('backend.vehicle.create', [
             'types' => Type::orderBy('name')->get(),
             'brands' => Brand::orderBy('name')->get(),
-            'specs' => SpecCategory::with('specs', 'specs.lists')
-                ->orderBy('priority')
-                ->get()
+            'specs' => SpecCategory::with('specs', 'specs.lists')->orderBy('priority')->get(),
         ]);
     }
 
     public function store(Request $request)
     {
+        // $validated = $request->validate([
+        //     'name' => 'required|string|max:255',
+        //     'type' => 'required|exists:types,id',
+        //     'brand' => 'required|exists:brands,id',
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'type' => 'required|exists:types,id',
-            'brand' => 'required|exists:brands,id',
+        //     'spec_ids' => 'required|array',
+        //     'spec_ids.*' => 'required|exists:specs,id',
 
-            'spec_ids' => 'required|array',
-            'spec_ids.*' => 'required|exists:specs,id',
+        //     'value_types' => 'required|array',
+        //     'value_types.*' => 'required|string|in:price,unit,description,list,availability',
 
-            'value_types' => 'required|array',
-            'value_types.*' => 'required|string|in:price,unit,description,list,availability',
+        //     'values' => 'required|array',
+        //     'values.*' => 'nullable|string',
 
-            'values' => 'required|array',
-            'values.*' => 'nullable|string',
+        //     'value_descriptions' => 'nullable|array',
+        //     'value_descriptions.*' => 'nullable|string',
+        // ]);
 
-            'value_descriptions' => 'nullable|array',
-            'value_descriptions.*' => 'nullable|string',
-        ]);
-        
         $typeId = $request->type;
         $brandId = $request->brand;
 
         $type = Type::find($typeId);
         $brand = Brand::find($brandId);
 
-        $vehicle = new Vehicle;
+        $vehicle = new Vehicle();
         $vehicle->name = $request->name;
 
         $vehicle->type()->associate($type);
         $vehicle->brand()->associate($brand);
         $vehicle->save();
+
+        // dd($vehicle->type, $vehicle->brand);
 
         $specIds = $request->spec_ids;
         $specTypes = $request->value_types;
@@ -118,7 +127,7 @@ class VehicleController extends Controller
                 $pivot[$specIds[$i]] = [
                     'value' => null,
                     'value_desc' => null,
-                    'value_bool' => null
+                    'value_bool' => null,
                 ];
                 $lists = null;
 
@@ -140,7 +149,7 @@ class VehicleController extends Controller
                 if ($specTypes[$i] == 'list') {
                     array_push($pivotLists, [
                         'specId' => $specIds[$i],
-                        'lists' => $lists
+                        'lists' => $lists,
                     ]);
                 }
             }
@@ -185,22 +194,45 @@ class VehicleController extends Controller
         //     $vehicle->specs()->attach($pivot);
         // }
 
+        // Simpan gambar
+        $imageUrl = null;
         if ($request->hasFile('pictures')) {
-            $pictures = collect($request->file('pictures'));
-            $pictures = $pictures->sortBy(function ($file) {
-                return $file->getClientOriginalName();
-            })->values();
+            $pictures = collect($request->file('pictures'))->sortBy->getClientOriginalName()->values();
 
             $pics = [];
             foreach ($pictures as $i => $img) {
-                array_push($pics, [
-                    'path' => $img->store('vehicle', 'public'),
-                    'thumbnail' => $i === 0 ? true : false
-                ]);
-            }
+                $path = $img->store('vehicle', 'public');
+                $pics[] = [
+                    'path' => $path,
+                    'thumbnail' => $i === 0,
+                ];
 
+                if ($i === 0) {
+                    $imageUrl = Storage::disk('public')->url($path);
+                }
+            }
             $vehicle->pictures()->createMany($pics);
         }
+
+        // Kirim notifikasi FCM
+        $message = CloudMessage::fromArray([
+            'topic' => 'infoev_vehicle',
+            'notification' => [
+                'title' => "Baru! {$vehicle->name} - {$vehicle->brand->name}",
+                'body' => "Lihat {$vehicle->type->name} terbaru dari {$vehicle->brand->name}. Klik untuk info selengkapnya!",
+                'image' => $imageUrl ?? '',
+            ],
+            'data' => [
+                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                'vehicle_id' => (string) $vehicle->id,
+                'name' => $vehicle->name,
+                'brand' => $vehicle->brand->name,
+                'type' => $vehicle->type->name,
+                'image' => $imageUrl ?? '',
+            ],
+        ]);
+
+        $this->messaging->send($message);
 
         return redirect()->route('backend.vehicle.index');
     }
@@ -210,15 +242,13 @@ class VehicleController extends Controller
         return view('backend.vehicle.edit', [
             'types' => Type::orderBy('name')->get(),
             'brands' => Brand::orderBy('name')->get(),
-            'specs' => SpecCategory::with('specs', 'specs.lists')
-                ->orderBy('name')
-                ->get(),
+            'specs' => SpecCategory::with('specs', 'specs.lists')->orderBy('name')->get(),
             // 'hiddenSpecs' => Spec::with(['vehicles' => function ($query) use ($vehicle) {
             //                     $query->where('vehicles.id', $vehicle->id);
             //                 }])
             //             ->where('hidden', true)
             //             ->get(),
-            'vehicle' => $vehicle
+            'vehicle' => $vehicle,
         ]);
     }
 
@@ -244,10 +274,7 @@ class VehicleController extends Controller
         $specDescriptions = $request->value_descriptions;
         $pivot = [];
         $pivotLists = [];
-        if (($specValues == null) ||
-            (count($specValues) == 1 &&
-                ($specValues[0] == null && $specDescriptions[0] == null))
-        ) {
+        if ($specValues == null || (count($specValues) == 1 && ($specValues[0] == null && $specDescriptions[0] == null))) {
             $vehicle->specs()->detach();
         } else {
             for ($i = 0; $i < count($specValues); $i++) {
@@ -258,7 +285,7 @@ class VehicleController extends Controller
                 $pivot[$specIds[$i]] = [
                     'value' => null,
                     'value_desc' => null,
-                    'value_bool' => null
+                    'value_bool' => null,
                 ];
                 $lists = null;
 
@@ -280,7 +307,7 @@ class VehicleController extends Controller
                 if ($specTypes[$i] == 'list') {
                     array_push($pivotLists, [
                         'specId' => $specIds[$i],
-                        'lists' => $lists
+                        'lists' => $lists,
                     ]);
                 }
             }
@@ -327,15 +354,17 @@ class VehicleController extends Controller
             }
 
             $pictures = collect($request->file('pictures'));
-            $pictures = $pictures->sortBy(function ($file) {
-                return $file->getClientOriginalName();
-            })->values();
+            $pictures = $pictures
+                ->sortBy(function ($file) {
+                    return $file->getClientOriginalName();
+                })
+                ->values();
 
             $pics = [];
             foreach ($pictures as $i => $img) {
                 array_push($pics, [
                     'path' => $img->store('vehicle', 'public'),
-                    'thumbnail' => $i === 0 ? true : false
+                    'thumbnail' => $i === 0 ? true : false,
                 ]);
             }
 

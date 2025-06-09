@@ -14,9 +14,11 @@
 
                 <a href="{{ route('home') }}">
                     @if ($logo && $logo->thumbnail)
-                        <img src="{{ asset('storage/' . $logo->thumbnail->path) }}" class="w-full max-w-[200px]" alt="Logo Info EV">
+                        <img src="{{ asset('storage/' . $logo->thumbnail->path) }}" class="w-full max-w-[200px]"
+                            alt="Logo Info EV">
                     @else
-                        <img src="{{ asset('images/default-logo.png') }}" class="w-full max-w-[200px]" alt="Default Logo">
+                        <img src="{{ asset('images/default-logo.png') }}" class="w-full max-w-[200px]"
+                            alt="Default Logo">
                     @endif
                 </a>
             </div>
@@ -59,24 +61,27 @@
 
                 @auth
                     <div class="flex items-center space-x-3">
-                   @auth
-    <a href="{{ route('keranjang.index') }}" class="block px-2 hover:text-grey shadow-inner">
-        <i class="fas fa-heart text-2xl"></i>
-    </a>
-@endauth
-
+                        @auth
+                            <a href="{{ route('keranjang.index') }}" class="block px-2 hover:text-grey shadow-inner">
+                                <i class="fas fa-heart text-2xl"></i>
+                            </a>
+                        @endauth
                         <div class="relative">
                             <button class="flex items-center space-x-2 focus:outline-none" id="user-menu-button">
                                 <span>{{ auth()->user()->name }}</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
-                            <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg hidden" id="user-menu">
-                                <a href="{{ route('profile.show') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profil</a>
+                            <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg hidden"
+                                id="user-menu">
+                                <a href="{{ route('profile.show') }}"
+                                    class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profil</a>
                                 <form method="POST" action="{{ route('logout') }}" class="block">
                                     @csrf
-                                    <button type="submit" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Keluar</button>
+                                    <button type="submit"
+                                        class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Keluar</button>
                                 </form>
                             </div>
                         </div>
@@ -97,7 +102,7 @@
 </nav>
 
 <script>
-    document.getElementById('user-menu-button')?.addEventListener('click', function () {
+    document.getElementById('user-menu-button')?.addEventListener('click', function() {
         document.getElementById('user-menu')?.classList.toggle('hidden');
     });
 </script>
